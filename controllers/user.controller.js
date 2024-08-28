@@ -46,6 +46,7 @@ const signupUser = async (req, res) => {
       name,
       email,
       username,
+      profilePic: 'https://res.cloudinary.com/drv3pneh8/image/upload/v1723006039/juj9fhpi2pg6tpkto4nt.png',
       password: hashedPassword,
     });
     await newUser.save();

@@ -14,6 +14,12 @@ const postSchema = mongoose.Schema(
     img: {
       type: String,
     },
+    widthRatio: {
+      type: Number,
+    },
+    heightRatio: {
+      type: Number,
+    },
     likes: {
       // array of user ids
       type: [mongoose.Schema.Types.ObjectId],

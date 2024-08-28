@@ -1,6 +1,6 @@
 {
-  "name": "burnx-backend",
-  "version": "1.0.0",
+  "name": "agora-backend",
+  "version": "1.0.1",
   "description": "A socila media backend with realtime chat",
   "type": "module",
   "main": "index.js",
@@ -12,7 +12,7 @@
   "keywords": [
     "socket.io"
   ],
-  "author": "vedant",
+  "author": "carlos",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",

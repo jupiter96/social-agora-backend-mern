@@ -33,10 +33,12 @@ app.use(cookieParser());
 import userRoutes from "./routes/user.routes.js";
 import postRoutes from "./routes/post.routes.js";
 import messageRoutes from "./routes/message.routes.js";
+import groupRoutes from "./routes/group.routes.js";
 
 app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
 app.use("/messages", messageRoutes);
+app.use("/group", groupRoutes);
 
 server.listen(PORT, () =>
   console.log(`Server started at http://localhost:${PORT}`)

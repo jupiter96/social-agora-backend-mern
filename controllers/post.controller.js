@@ -5,8 +5,8 @@ import Post from "../models/post.model.js";
 const createPost = async (req, res) => {
   try {
     const { postedBy, text } = req.body;
+    console.log(postedBy,text);
     let { img } = req.body;
-    console.log("aaaaaaaaaaaaaaaaaaaaaa",req.body)
     if (!postedBy || !text) {
       return res
         .status(400)
@@ -33,8 +33,10 @@ const createPost = async (req, res) => {
       const uploadedResponse = await cloudinary.uploader.upload(img);
       img = uploadedResponse.secure_url;
     }
+    const values = [1, 2];
+    const randomValue = values[Math.round(Math.random())];
 
-    const newPost = new Post({ postedBy, text, img });
+    const newPost = new Post({ postedBy, text, img, widthRatio: 1, heightRatio: 1 });
     await newPost.save();
 
     res.status(201).json(newPost);
