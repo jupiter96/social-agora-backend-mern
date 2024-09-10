@@ -2,6 +2,7 @@ import express from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import {
   HealthCheck,
+  getAllUsers,
   SearchUser,
   followUnFollowUser,
   freezeAccount,
@@ -12,6 +13,9 @@ import {
   logoutUser,
   signupUser,
   updateUser,
+  deleteUser,
+  editUser,
+  getstatistics
 } from "../controllers/user.controller.js";
 
 const router = express.Router();
@@ -34,8 +38,16 @@ router.route("/follow/:id").post(verifyJWT, followUnFollowUser);
 
 router.route("/update/:id").put(verifyJWT, updateUser);
 
+router.route("/edituser/:id").put(verifyJWT, editUser);
+
+router.route("/deleteuser/:id").delete(deleteUser);
+
 router.route("/freeze").put(verifyJWT, freezeAccount);
 
 router.route("/health-check").get(HealthCheck);
+
+router.route("/getallusers").get(verifyJWT, getAllUsers);
+
+router.route("/getstatistics").get(getstatistics);
 
 export default router;

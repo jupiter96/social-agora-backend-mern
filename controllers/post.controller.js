@@ -162,6 +162,14 @@ const getFeedPosts = async (req, res) => {
   }
 };
 
+const getstatistics = async (req, res) => {
+  try {
+    const feedCount = await Post.countDocuments();
+    res.status(200).json({postCount: feedCount});
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 const getUserPosts = async (req, res) => {
   const { username } = req.params;
   try {
@@ -188,4 +196,5 @@ export {
   replyToPost,
   getFeedPosts,
   getUserPosts,
+  getstatistics
 };

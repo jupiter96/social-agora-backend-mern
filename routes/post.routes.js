@@ -9,11 +9,14 @@ import {
   getUserPosts,
   likeUnlikePost,
   replyToPost,
+  getstatistics
 } from "../controllers/post.controller.js";
 
 const router = express.Router();
 
 router.route("/feed").get(verifyJWT, getFeedPosts);
+
+router.route("/getfeedstatistics").get(getstatistics);
 
 router.route("/:id").get(getPost);
 

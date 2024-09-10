@@ -42,6 +42,17 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    role: {
+      type: String,
+      default: 'User',
+    },
+    member: {
+      type: String,
+      default: 'Free'
+    },
+    expireDate: {
+      type: [String],
+    }
   },
   {
     timestamps: true,
