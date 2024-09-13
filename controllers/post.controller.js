@@ -5,7 +5,6 @@ import Post from "../models/post.model.js";
 const createPost = async (req, res) => {
   try {
     const { postedBy, text } = req.body;
-    console.log(postedBy,text);
     let { img } = req.body;
     if (!postedBy || !text) {
       return res
@@ -18,9 +17,9 @@ const createPost = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    if (user._id.toString() !== req.user._id.toString()) {
-      return res.status(401).json({ error: "Unauthorized to create post" });
-    }
+    // if (user._id.toString() !== req.user._id.toString()) {
+    //   return res.status(401).json({ error: "Unauthorized to create post" });
+    // }
 
     const maxLength = 500;
     if (text.length > maxLength) {
@@ -39,7 +38,7 @@ const createPost = async (req, res) => {
     const newPost = new Post({ postedBy, text, img, widthRatio: 1, heightRatio: 1 });
     await newPost.save();
 
-    res.status(201).json(newPost);
+    res.status(200).json(newPost);
   } catch (err) {
     res.status(500).json({ error: err.message });
     console.log(err);
@@ -79,6 +78,53 @@ const deletePost = async (req, res) => {
     await Post.findByIdAndDelete(req.params.id);
 
     res.status(200).json({ message: "Post deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+const deleteFeed = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    if (post.img) {
+      const imgId = post.img.split("/").pop().split(".")[0];
+      await cloudinary.uploader.destroy(imgId);
+    }
+
+    await Post.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({ message: "Post deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const editfeed = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { postedBy, text, createdAt } = req.body;
+    let { img } = req.body;
+
+    let post = await Post.findById(id);
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+    if (img.includes("base64")) {
+      const uploadedResponse = await cloudinary.uploader.upload(img);
+      img = uploadedResponse.secure_url;
+    }
+    
+    post.text = text || post.text;
+    post.img = img || post.img;
+    post.createdAt = createdAt || post.createdAt;
+    post = await post.save();
+
+    res.status(200).json(post);
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -191,6 +237,8 @@ const getUserPosts = async (req, res) => {
 export {
   createPost,
   getPost,
+  deleteFeed,
+  editfeed,
   deletePost,
   likeUnlikePost,
   replyToPost,

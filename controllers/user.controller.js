@@ -33,8 +33,8 @@ const getUserProfile = async (req, res) => {
 
 const signupUser = async (req, res) => {
   try {
-    const { name, email, username, password } = req.body;
-    const user = await User.findOne({ $or: [{ email }, { username }] });
+    let { name, email, username, password, profilePic, bio, role, member, expireDate } = req.body;
+    let user = await User.findOne({ $or: [{ email }, { username }] });
 
     if (user) {
       return res.status(200).json({ error: "User already exists" });
@@ -42,11 +42,20 @@ const signupUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    if (profilePic) {
+      const uploadedResponse = await cloudinary.uploader.upload(profilePic);
+      profilePic = uploadedResponse.secure_url;
+    }
+
     const newUser = new User({
       name,
       email,
+      bio,
+      role: role? role: 'User',
+      member: member? member: 'Free',
+      expireDate: expireDate? expireDate: null,
       username,
-      profilePic: 'https://res.cloudinary.com/drv3pneh8/image/upload/v1723006039/juj9fhpi2pg6tpkto4nt.png',
+      profilePic: profilePic ? profilePic : 'https://res.cloudinary.com/drv3pneh8/image/upload/v1723006039/juj9fhpi2pg6tpkto4nt.png',
       password: hashedPassword,
     });
     await newUser.save();
@@ -61,6 +70,9 @@ const signupUser = async (req, res) => {
         username: newUser.username,
         bio: newUser.bio,
         profilePic: newUser.profilePic,
+        role: newUser.role,
+        member: newUser.member,
+        expireDate: newUser.expireDate,
         token: token,
       });
     } else {
@@ -98,6 +110,9 @@ const loginUser = async (req, res) => {
       username: user.username,
       bio: user.bio,
       profilePic: user.profilePic,
+      role: user.role,
+      member: user.member,
+      expireDate: user.expireDate,
       token: token,
     });
   } catch (error) {
@@ -210,8 +225,6 @@ const updateUser = async (req, res) => {
 };
 
 const editUser = async (req, res) => {
-  console.log("aaaaaaaaaaa", req?.body);
-  console.log("aaaaaaaaaaa", req.params.id);
   const { name, email, username, password, bio } = req?.body;
   let { profilePic } = req?.body;
 
@@ -231,16 +244,16 @@ const editUser = async (req, res) => {
       user.password = hashedPassword;
     }
 
-    // if (profilePic) {
-    //   if (user.profilePic) {
-    //     await cloudinary.uploader.destroy(
-    //       user.profilePic.split("/").pop().split(".")[0]
-    //     );
-    //   }
+    if (profilePic) {
+      if (user.profilePic) {
+        await cloudinary.uploader.destroy(
+          user.profilePic.split("/").pop().split(".")[0]
+        );
+      }
 
-    //   const uploadedResponse = await cloudinary.uploader.upload(profilePic);
-    //   profilePic = uploadedResponse.secure_url;
-    // }
+      const uploadedResponse = await cloudinary.uploader.upload(profilePic);
+      profilePic = uploadedResponse.secure_url;
+    }
 
     user.name = name || user.name;
     user.email = email || user.email;

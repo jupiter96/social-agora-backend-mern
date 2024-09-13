@@ -9,6 +9,8 @@ import {
   getUserPosts,
   likeUnlikePost,
   replyToPost,
+  deleteFeed,
+  editfeed,
   getstatistics
 } from "../controllers/post.controller.js";
 
@@ -25,6 +27,10 @@ router.route("/user/:username").get(verifyJWT, getUserPosts);
 router.route("/create").post(verifyJWT, createPost);
 
 router.route("/:id").delete(verifyJWT, deletePost);
+
+router.route("/deletefeed/:id").delete(verifyJWT, deleteFeed);
+
+router.route("/editfeed/:id").put(verifyJWT, editfeed);
 
 router.route("/like/:id").put(verifyJWT, likeUnlikePost);
 
