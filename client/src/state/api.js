@@ -5,7 +5,7 @@ export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl:
       process.env.REACT_APP_BASE_URL ||
-      "http://localhost:8080",
+      "http://127.0.0.1:8080",
   }), // base url
   reducerPath: "adminApi",
   // tags

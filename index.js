@@ -19,7 +19,7 @@ dotenv.config();
 
 connectDB();
 
-const PORT = process.env.PORT || 5736;
+const PORT = process.env.PORT || 8080;
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
