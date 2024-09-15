@@ -5,7 +5,7 @@ export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl:
       process.env.REACT_APP_BASE_URL ||
-      "http://127.0.0.1:8080",
+      "https://api.agorasocialgaming.com",
   }), // base url
   reducerPath: "adminApi",
   // tags
