@@ -1,0 +1,73 @@
+{
+  "name": "client",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "author": "Sanidhya Kr. Verma",
+  "description": "Modern Full Stack Admin Dashboard using MERN",
+  "keywords": [
+    "reactjs",
+    "react",
+    "admin-app",
+    "mern",
+    "mongodb",
+    "modern-ui/ux",
+    "js",
+    "javascript",
+    "html",
+    "css"
+  ],
+  "dependencies": {
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
+    "@mui/icons-material": "^5.11.11",
+    "@mui/material": "^5.11.13",
+    "@mui/system": "^6.0.1",
+    "@mui/x-data-grid": "5.17.13",
+    "@mui/x-date-pickers": "^7.15.0",
+    "@nivo/bar": "^0.80.0",
+    "@nivo/core": "^0.80.0",
+    "@nivo/geo": "^0.80.0",
+    "@nivo/line": "^0.80.0",
+    "@nivo/pie": "^0.80.0",
+    "@reduxjs/toolkit": "^1.9.3",
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^13.0.0",
+    "@testing-library/user-event": "^13.2.1",
+    "dayjs": "^1.11.13",
+    "i18next": "^23.14.0",
+    "react": "^18.2.0",
+    "react-datepicker": "4.8.0",
+    "react-dom": "^18.2.0",
+    "react-i18next": "^15.0.1",
+    "react-redux": "^8.0.5",
+    "react-router-dom": "6",
+    "react-scripts": "5.0.1",
+    "redux-persist": "^6.0.0",
+    "web-vitals": "^2.1.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
