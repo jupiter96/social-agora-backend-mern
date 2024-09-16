@@ -55,7 +55,7 @@ const signupUser = async (req, res) => {
       member: member? member: 'Free',
       expireDate: expireDate? expireDate: null,
       username,
-      profilePic: profilePic ? profilePic : 'https://res.cloudinary.com/drv3pneh8/image/upload/v1723006039/juj9fhpi2pg6tpkto4nt.png',
+      profilePic: profilePic ? profilePic : 'https://res.cloudinary.com/drv3pneh8/image/upload/v1726447925/mbs4qsmyvwqzqxp9hmvq.png',
       password: hashedPassword,
     });
     await newUser.save();
