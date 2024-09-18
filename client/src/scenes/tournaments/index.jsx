@@ -3,7 +3,7 @@ import { Box, useTheme, Button, CircularProgress, Dialog, DialogTitle, DialogCon
 import {
   AddCircle,
   Edit,
-  Visibility,
+  // Visibility,
   Delete
 } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
@@ -34,10 +34,10 @@ const Tournaments = () => {
     setUpdate([]);
   };
 
-  const handleView = () => {
-    setOpen(true);
-    setUpdate([]);
-  };
+  // const handleView = () => {
+  //   setOpen(true);
+  //   setUpdate([]);
+  // };
 
   const handleClose = () => {
     setStatus(true);
@@ -130,21 +130,21 @@ const Tournaments = () => {
           flexDirection: 'row',
           gap: 10
         }}>
-        <Button 
+        {/* <Button 
           onClick={() => handleView(params.row)}
           sx={{ color: theme.palette.background.light, width: '25%' }}
         >
           <Visibility color={theme.palette.background.light} />
-        </Button>
+        </Button> */}
           <Button 
             onClick={() => handleEdit(params.row)}
-            sx={{ color: theme.palette.background.light, width: '25%' }}
+            sx={{ color: theme.palette.background.light, width: '45%' }}
           >
             <Edit color={theme.palette.background.light} />
           </Button>
           <Button 
             onClick={() => handleDelete(params.row._id)}
-            sx={{ marginLeft: '8px', color: theme.palette.action.delete, width: '25%' }}
+            sx={{ marginLeft: '8px', color: theme.palette.action.delete, width: '45%' }}
           >
             <Delete color={theme.palette.action.delete} />
           </Button>

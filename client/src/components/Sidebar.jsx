@@ -26,7 +26,7 @@ import {
   People,
   Wifi,
   LocalFireDepartment,
-  Chat,
+  // Chat,
   SportsEsports,
   Groups,
   Paid,
@@ -88,11 +88,11 @@ const navItems = [
     title: `${t("tournament")}s`,
     icon: <LocalFireDepartment />,
   },
-  {
-    text: "Chats",
-    title: t("chats"),
-    icon: <Chat />,
-  },
+  // {
+  //   text: "Chats",
+  //   title: t("chats"),
+  //   icon: <Chat />,
+  // },
   {
     text: "Games",
     title: t("games"),
