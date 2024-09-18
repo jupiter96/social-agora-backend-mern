@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const paymentSchema = mongoose.Schema(
   {
     user: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
     },
     amount: {

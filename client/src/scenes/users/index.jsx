@@ -47,12 +47,12 @@ const Users = () => {
     {
       field: "_id",
       headerName: "ID",
-      flex: 0.5,
+      flex: 0.3,
     },
     {
       field: 'profilePic',
       headerName: t("Avatar"),
-      width: 60,
+      flex: 0.05,
       renderCell: (params) => (
         <img
           src={params.value}
@@ -64,22 +64,22 @@ const Users = () => {
     {
       field: "name",
       headerName: t("name"),
-      flex: 0.5,
+      flex: 0.1,
     },
     {
       field: "email",
       headerName: t("email"),
-      flex: 1,
+      flex: 0.15,
     },
     {
       field: "username",
       headerName: t("username"),
-      flex: 0.5,
+      flex: 0.2,
     },
     {
       field: "actions",
       headerName: t("action"),
-      flex: 0.5,
+      flex: 0.2,
       renderCell: (params) => (
         <div>
           <Button 
@@ -201,7 +201,9 @@ const Users = () => {
         mb="50px"
         sx={{
           overflowX: 'auto',
-          width: '100%',
+          justifyItems: 'center',
+          alignItems: 'center',
+          margin: 'auto',
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: theme.palette.background.alt,
             color: theme.palette.secondary[100],
@@ -217,7 +219,7 @@ const Users = () => {
           },
           '@media (max-width: 600px)': {
             '& .MuiDataGrid-root': {
-              minWidth: '960px',
+              width: '1200px',
             },
           },
         }}

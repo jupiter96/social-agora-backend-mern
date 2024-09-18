@@ -25,7 +25,7 @@ const AddFeedModal = ({ open, onClose, update, processHandle, severityHandle, me
     text: update?.text ? update.text:'',
     postedBy: update?.postedBy ? update.postedBy:'',
     img: update?.img ? update.img:null,
-    createdAt: update?.createdAt ? dayjs(update.createdAt):dayjs().toISOString(),
+    createdAt: update?.createdAt ? dayjs(update.createdAt):dayjs(),
   });
   const [imagePreview, setImagePreview] = useState(null);
   const theme = useTheme();
@@ -117,7 +117,7 @@ const AddFeedModal = ({ open, onClose, update, processHandle, severityHandle, me
         text: update?.text ? update.text:'',
         postedBy: update?.postedBy ? update.postedBy:'',
         img: update?.img ? update.img:null,
-        createdAt: update?.createdAt ? dayjs(update.createdAt):dayjs().toISOString(),
+        createdAt: update?.createdAt ? dayjs(update.createdAt):dayjs(),
       });
       setImagePreview(update?.img ? update.img:null);
     }
@@ -209,7 +209,7 @@ const AddFeedModal = ({ open, onClose, update, processHandle, severityHandle, me
             <Box display="flex" alignItems="center" marginTop={2}>
               <DatePicker
                 label={t("createdAt")}
-                value={update?.createdAt ? dayjs(update.createdAt):dayjs()}
+                value={dayjs(formData.createdAt) || dayjs()}
                 onChange={(newValue) => handleDateChange(newValue)}
                 slotProps={{
                   textField: {

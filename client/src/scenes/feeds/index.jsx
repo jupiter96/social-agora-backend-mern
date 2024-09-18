@@ -49,17 +49,17 @@ const Feeds = () => {
     {
       field: "_id",
       headerName: "ID",
-      flex: 0.5,
+      flex: 0.2,
     },
     {
       field: "text",
       headerName: t("text"),
-      flex: 0.5,
+      flex: 0.2,
     },
     {
       field: 'img',
       headerName: t("media"),
-      width: 100,
+      flex: 0.1,
       renderCell: (params) => (
         <img
           src={params.value}
@@ -71,13 +71,13 @@ const Feeds = () => {
     {
       field: "postedBy",
       headerName: t("postedby"),
-      flex: 0.5,
+      flex: 0.1,
     },
     
     {
       field: 'likes',
       headerName: t("likes"),
-      flex: 0.2,
+      flex: 0.05,
       renderCell: (params) => (
         <h4>{params.value?.length}</h4>
       ),
@@ -86,7 +86,7 @@ const Feeds = () => {
     {
       field: 'replies',
       headerName: t("replies"),
-      flex: 0.2,
+      flex: 0.05,
       renderCell: (params) => (
         <h4>{params.value?.length}</h4>
       ),
@@ -95,7 +95,7 @@ const Feeds = () => {
     {
       field: 'createdAt',
       headerName: t("createdAt"),
-      flex: 0.4,
+      flex: 0.15,
       renderCell: (params) => (
         <h4>{params.value?.split("T")[0]}</h4>
       ),
@@ -103,7 +103,7 @@ const Feeds = () => {
     {
       field: "actions",
       headerName: t("action"),
-      flex: 0.5,
+      flex: 0.15,
       renderCell: (params) => (
         <div>
           <Button 
@@ -241,7 +241,7 @@ const Feeds = () => {
           },
           '@media (max-width: 600px)': {
             '& .MuiDataGrid-root': {
-              minWidth: '960px',
+              minWidth: '1200px',
             },
           },
         }}

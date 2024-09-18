@@ -8,6 +8,11 @@ import {
   TextField,
   IconButton,
   Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Chip,
   Autocomplete,
   Typography,
   useTheme
@@ -18,26 +23,42 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { useCreateFeedMutation, useEditFeedMutation, useGetAllusersQuery } from "state/api";
+import { useCreateTournamentMutation, useEditTournamentMutation, useGetAllusersQuery } from "state/api";
 
 const AddTournamentModal = ({ open, onClose, update, processHandle, severityHandle, messageHandle, showToastHandle }) => {
   const [formData, setFormData] = useState({
     id: update?._id ? update._id:'',
-    text: update?.text ? update.text:'',
-    postedBy: update?.postedBy ? update.postedBy:'',
-    img: update?.img ? update.img:null,
-    createdAt: update?.createdAt ? dayjs(update.createdAt):dayjs().toISOString(),
+    title: update?.title ? update.title:'',
+    adminUser: update?.adminUser ? update.adminUser:'',
+    imgUrl: update?.imgUrl ? update.imgUrl:null,
+    type: update?.type ? update.type:'',
+    description: update?.description ? update.description:'',
+    start_time: update?.start_time ? dayjs(update.start_time):dayjs(),
+    end_time: update?.end_time ? dayjs(update.end_time):dayjs(),
+    fee: update?.fee ? update.fee:'',
+    reward: update?.reward ? update.reward:'',
+    limit: update?.limit ? update.limit:'',
+    members: update?.members ? update.members:[],
+    status: update?.status ? update.status:'',
   });
   const [imagePreview, setImagePreview] = useState(null);
   const theme = useTheme();
   const { t } = useTranslation();
-  const [createFeed] = useCreateFeedMutation();
-  const [editFeed] = useEditFeedMutation();
+  const [createTournament] = useCreateTournamentMutation();
+  const [editTournament] = useEditTournamentMutation();
   const { data, refetch } = useGetAllusersQuery();
   const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedMember, setSelectedMember] = useState([]);
 
-  const handleDateChange = (newValue) => {
-    setFormData((prev) => ({ ...prev, createdAt: dayjs(newValue).toISOString() }))
+  const handleStartDateChange = (newValue) => {
+    if (newValue && newValue.isValid()) {
+      setFormData((prev) => ({ ...prev, start_time: dayjs(newValue).toISOString() }))
+    } else {
+      console.error("Invalid date selected");
+    }
+  };
+  const handleEndDateChange = (newValue) => {
+    setFormData((prev) => ({ ...prev, end_time: dayjs(newValue).toISOString() }))
   };
 
   const handleChange = (e) => {
@@ -51,7 +72,7 @@ const AddTournamentModal = ({ open, onClose, update, processHandle, severityHand
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
-        setFormData((prevData) => ({ ...prevData, img: reader.result }));
+        setFormData((prevData) => ({ ...prevData, imgUrl: reader.result }));
       };
       reader.readAsDataURL(file);
     }
@@ -61,9 +82,9 @@ const AddTournamentModal = ({ open, onClose, update, processHandle, severityHand
     e.preventDefault();
     processHandle(true);
     if(update?._id){
-      if(formData.username !== '' && formData.text !== ''){
+      if(formData.title !== '' && formData.adminUser !== '' && formData.fee !== '' && formData.reward !== ''){
         try {
-          const response = await editFeed(formData).unwrap();
+          const response = await editTournament(formData).unwrap();
           if(response.error){
             alert(response.error);
           }else{
@@ -85,9 +106,9 @@ const AddTournamentModal = ({ open, onClose, update, processHandle, severityHand
           alert("fill out all!")
       }
     }else{
-      if(formData.text !== '' && formData.postedBy !== ''){
+      if(formData.title !== '' && formData.adminUser !== '' && formData.fee !== '' && formData.reward !== ''){
         try {
-          const response = await createFeed(formData).unwrap();
+          const response = await createTournament(formData).unwrap();
           if(response.error){
             alert(response.error);
           }else{
@@ -115,15 +136,24 @@ const AddTournamentModal = ({ open, onClose, update, processHandle, severityHand
     if(update){
       setFormData({
         id: update?._id ? update._id:'',
-        text: update?.text ? update.text:'',
-        postedBy: update?.postedBy ? update.postedBy:'',
-        img: update?.img ? update.img:null,
-        createdAt: update?.createdAt ? dayjs(update.createdAt):dayjs().toISOString(),
+        title: update?.title ? update.title:'',
+        adminUser: update?.adminUser ? update.adminUser:'',
+        imgUrl: update?.imgUrl ? update.imgUrl:null,
+        type: update?.type ? update.type:'',
+        description: update?.description ? update.description:'',
+        start_time: update?.start_time ? dayjs(update.start_time):dayjs(),
+        end_time: update?.end_time ? dayjs(update.end_time):dayjs(),
+        fee: update?.fee ? update.fee:'',
+        reward: update?.reward ? update.reward:'',
+        limit: update?.limit ? update.limit:'',
+        members: update?.members ? update.members:[],
+        status: update?.status ? update.status:'',
       });
-      setImagePreview(update?.img ? update.img:null);
+      setImagePreview(update?.imgUrl ? update.imgUrl:null);
+      setSelectedMember(data?.filter(user => update?.members?.includes(user._id)));
     }
     refetch();
-  }, [update, refetch])
+  }, [update, refetch, data])
   return (
     <Dialog open={open} onClose={onClose}>
       {update?._id ? (<DialogTitle>{t("edit")} {t("tournament")}</DialogTitle>) : (<DialogTitle>{t("addTournament")}</DialogTitle>)}
@@ -167,22 +197,20 @@ const AddTournamentModal = ({ open, onClose, update, processHandle, severityHand
               </label>
             </Box>
             <TextField
-              label={t("text")}
-              name="text"
+              label={t("title")}
+              name="title"
               fullWidth
               margin="normal"
-              value={formData.text}
+              value={formData.title}
               onChange={handleChange}
-              multiline
-              rows={4}
             />
             {update?._id ? (<TextField
-              label={t("postedBy")}
-              name="postedBy"
+              label={t("admin")}
+              name="adminUser"
               type="text"
               fullWidth
               margin="normal"
-              value={data.find(user => user._id === formData.postedBy) ? data.find(user => user._id === formData.postedBy).name + " ( " + formData.postedBy + " )" : ""}
+              value={data.find(user => user._id === formData.adminUser) ? data.find(user => user._id === formData.adminUser).name + " ( " + formData.adminUser + " )" : ""}
               onChange={handleChange}
               disabled
             />):(
@@ -191,11 +219,11 @@ const AddTournamentModal = ({ open, onClose, update, processHandle, severityHand
                 getOptionLabel={(option) => option.name}
                 onChange={(event, newValue) => {
                   setSelectedUser(newValue);
-                  setFormData((prevData) => ({ ...prevData, postedBy: newValue._id }));
+                  setFormData((prevData) => ({ ...prevData, adminUser: newValue._id }));
 
                 }}
                 renderInput={(params) => (
-                  <TextField {...params} label="Select User" variant="outlined" />
+                  <TextField {...params} label={t("selectUser")} variant="outlined" />
                 )}
                 
                 filterOptions={(options, { inputValue }) => {
@@ -209,11 +237,50 @@ const AddTournamentModal = ({ open, onClose, update, processHandle, severityHand
                   option.id === value.id}
               />
             )}
+            <TextField
+              label={t("description")}
+              name="description"
+              fullWidth
+              margin="normal"
+              value={formData.description}
+              onChange={handleChange}
+              multiline
+              rows={4}
+            />
+            <FormControl fullWidth margin="normal">
+              <InputLabel>{t("type")}</InputLabel>
+              <Select
+                name='type'
+                value={formData.type}
+                onChange={handleChange}
+              >
+                <MenuItem value="Individual">{t("individual")}</MenuItem>
+                <MenuItem value="team">{t("team")}</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              label={t("fee")}
+              name="fee"
+              type='number'
+              fullWidth
+              margin="normal"
+              value={formData.fee}
+              onChange={handleChange}
+            />
+            <TextField
+              label={t("reward")}
+              name="reward"
+              type='number'
+              fullWidth
+              margin="normal"
+              value={formData.reward}
+              onChange={handleChange}
+            />
             <Box display="flex" alignItems="center" marginTop={2}>
               <DatePicker
-                label={t("createdAt")}
-                value={update?.createdAt ? dayjs(update.createdAt):dayjs()}
-                onChange={(newValue) => handleDateChange(newValue)}
+                label={t("startTime")}
+                value={dayjs(formData.start_time) || dayjs()}
+                onChange={(newValue) => handleStartDateChange(newValue)}
                 slotProps={{
                   textField: {
                     variant: 'outlined',
@@ -222,6 +289,70 @@ const AddTournamentModal = ({ open, onClose, update, processHandle, severityHand
                 }}
               />
             </Box>
+            <Box display="flex" alignItems="center" marginTop={2}>
+              <DatePicker
+                label={t("endTime")}
+                value={dayjs(formData.end_time) || dayjs()}
+                onChange={(newValue) => handleEndDateChange(newValue)}
+                slotProps={{
+                  textField: {
+                    variant: 'outlined',
+                    fullWidth: true,
+                  },
+                }}
+              />
+            </Box>
+            <TextField
+              label={t("limit")}
+              name="limit"
+              type='number'
+              fullWidth
+              margin="normal"
+              value={formData.limit}
+              onChange={handleChange}
+            />
+
+            
+              <Box marginTop={2}>
+                <Autocomplete
+                  multiple
+                  options={data? data: []}
+                  getOptionLabel={(option) => option.name}
+                  onChange={(event, newValue) => {
+                    setSelectedMember(newValue);
+                    setFormData((prevData) => ({ ...prevData,
+                      members: newValue.map(user => user._id),}));
+
+                  }}
+                  renderInput={(params) => (
+                    <TextField {...params} label={t("selectUser")} variant="outlined" />
+                  )}
+                  
+                  filterOptions={(options, { inputValue }) => {
+                    return options?.filter((option) =>
+                      option?.name.toLowerCase().includes(inputValue.toLowerCase())
+                    );
+                  }}
+                  
+                  value={selectedMember || []}
+                  renderTags={(value, getTagProps) =>
+                    value.map((option, index) => (
+                      <Chip variant="outlined" label={option.name} {...getTagProps({ index })} />
+                    ))
+                  }
+                />
+              </Box>
+            <FormControl fullWidth margin="normal">
+              <InputLabel>{t("status")}</InputLabel>
+              <Select
+                name='status'
+                value={formData.status}
+                onChange={handleChange}
+              >
+                <MenuItem value="Active">{t("active")}</MenuItem>
+                <MenuItem value="InActive">{t("inactive")}</MenuItem>
+              </Select>
+            </FormControl>
           </form>
         </LocalizationProvider>
       </DialogContent>

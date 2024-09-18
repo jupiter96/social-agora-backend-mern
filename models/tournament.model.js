@@ -44,7 +44,7 @@ const tournamentSchema = mongoose.Schema(
       required: true,
     },
     members: {
-      type: [String],
+      type: [mongoose.Schema.Types.ObjectId],
       default: [],
     },
     status: {

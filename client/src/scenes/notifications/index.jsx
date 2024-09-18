@@ -7,7 +7,7 @@ import {
 } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
 
-import { useGetAllFeedsQuery, useDeleteFeedMutation } from "state/api";
+import { useGetAllNotificationsQuery, useDeleteNotificationMutation } from "state/api";
 import { Header, FlexBetween, ToastNotification } from "components";
 import { useTranslation } from 'react-i18next';
 import AddNotificationModal from './AddNotificationModal';
@@ -16,8 +16,8 @@ const Notifications = () => {
   
   const theme = useTheme();
   
-  const { data, isLoading, refetch } = useGetAllFeedsQuery();
-  const [ deleteFeed ] = useDeleteFeedMutation();
+  const { data, isLoading, refetch } = useGetAllNotificationsQuery();
+  const [ deleteNotification ] = useDeleteNotificationMutation();
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState(false);
@@ -52,53 +52,24 @@ const Notifications = () => {
       flex: 0.5,
     },
     {
-      field: "text",
-      headerName: t("text"),
+      field: "title",
+      headerName: t("title"),
       flex: 0.5,
     },
     {
-      field: 'img',
-      headerName: t("media"),
-      width: 100,
-      renderCell: (params) => (
-        <img
-          src={params.value}
-          alt="media"
-          style={{ width: '80px', height: 'auto', padding: '10px' }}
-        />
-      ),
-    },
-    {
-      field: "postedBy",
-      headerName: t("postedby"),
+      field: "description",
+      headerName: t("description"),
       flex: 0.5,
     },
-    
     {
-      field: 'likes',
-      headerName: t("likes"),
-      flex: 0.2,
-      renderCell: (params) => (
-        <h4>{params.value?.length}</h4>
-      ),
+      field: "duration",
+      headerName: t("duration"),
+      flex: 0.5,
     },
-    
     {
-      field: 'replies',
-      headerName: t("replies"),
-      flex: 0.2,
-      renderCell: (params) => (
-        <h4>{params.value?.length}</h4>
-      ),
-    },
-    
-    {
-      field: 'createdAt',
-      headerName: t("createdAt"),
-      flex: 0.4,
-      renderCell: (params) => (
-        <h4>{params.value?.split("T")[0]}</h4>
-      ),
+      field: "status",
+      headerName: t("status"),
+      flex: 0.5,
     },
     {
       field: "actions",
@@ -134,7 +105,7 @@ const Notifications = () => {
       if (userConfirmed) {
         setProcessing(true);
         try {
-          const response = await deleteFeed(id).unwrap();
+          const response = await deleteNotification(id).unwrap();
           if(response.error){
             alert(response.error);
           }else{
@@ -247,7 +218,7 @@ const Notifications = () => {
         }}
       >
         
-        {/* <DataGrid
+        <DataGrid
           loading={isLoading || !data}
           getRowId={(row) => row._id}
           rows={data ? data : []}
@@ -262,7 +233,7 @@ const Notifications = () => {
           }}
           autoHeight 
           disableSelectionOnClick 
-        /> */}
+        />
       </Box>
       <ToastNotification open={showToast} message={message} severity={severity} hideToast={hideToast} />
     </Box>

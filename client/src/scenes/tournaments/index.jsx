@@ -3,11 +3,12 @@ import { Box, useTheme, Button, CircularProgress, Dialog, DialogTitle, DialogCon
 import {
   AddCircle,
   Edit,
+  Visibility,
   Delete
 } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
 
-import { useGetAllFeedsQuery, useDeleteFeedMutation } from "state/api";
+import { useGetAllTournamentsQuery, useDeleteTournamentMutation } from "state/api";
 import { Header, FlexBetween, ToastNotification } from "components";
 import { useTranslation } from 'react-i18next';
 import AddTournamentModal from './AddTournamentModal';
@@ -16,8 +17,8 @@ const Tournaments = () => {
   
   const theme = useTheme();
   
-  const { data, isLoading, refetch } = useGetAllFeedsQuery();
-  const [ deleteFeed ] = useDeleteFeedMutation();
+  const { data, isLoading, refetch } = useGetAllTournamentsQuery();
+  const [ deleteTournament ] = useDeleteTournamentMutation();
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState(false);
@@ -29,6 +30,11 @@ const Tournaments = () => {
   const [currentTab, setCurrentTab] = useState(0);
 
   const handleClickOpen = () => {
+    setOpen(true);
+    setUpdate([]);
+  };
+
+  const handleView = () => {
     setOpen(true);
     setUpdate([]);
   };
@@ -56,12 +62,12 @@ const Tournaments = () => {
       flex: 0.5,
     },
     {
-      field: "text",
-      headerName: t("text"),
+      field: "title",
+      headerName: t("title"),
       flex: 0.5,
     },
     {
-      field: 'img',
+      field: 'imgUrl',
       headerName: t("media"),
       width: 100,
       renderCell: (params) => (
@@ -73,36 +79,47 @@ const Tournaments = () => {
       ),
     },
     {
-      field: "postedBy",
-      headerName: t("postedby"),
+      field: "adminUser",
+      headerName: t("admin"),
+      flex: 0.5,
+    },
+    {
+      field: "type",
+      headerName: t("type"),
+      flex: 0.5,
+    },
+    {
+      field: "fee",
+      headerName: t("fee"),
+      flex: 0.5,
+    },
+    {
+      field: "reward",
+      headerName: t("reward"),
       flex: 0.5,
     },
     
     {
-      field: 'likes',
-      headerName: t("likes"),
-      flex: 0.2,
-      renderCell: (params) => (
-        <h4>{params.value?.length}</h4>
-      ),
-    },
-    
-    {
-      field: 'replies',
-      headerName: t("replies"),
-      flex: 0.2,
-      renderCell: (params) => (
-        <h4>{params.value?.length}</h4>
-      ),
-    },
-    
-    {
-      field: 'createdAt',
-      headerName: t("createdAt"),
+      field: 'start_time',
+      headerName: t("startTime"),
       flex: 0.4,
       renderCell: (params) => (
-        <h4>{params.value?.split("T")[0]}</h4>
+        <h4>{params.value?.split("T")[0]} {params.value?.split("T")[0].split(".")[0]}</h4>
       ),
+    },
+    
+    {
+      field: 'end_time',
+      headerName: t("endTime"),
+      flex: 0.4,
+      renderCell: (params) => (
+        <h4>{params.value?.split("T")[0]} {params.value?.split("T")[0].split(".")[0]}</h4>
+      ),
+    },
+    {
+      field: "status",
+      headerName: t("status"),
+      flex: 0.5,
     },
     {
       field: "actions",
@@ -110,6 +127,12 @@ const Tournaments = () => {
       flex: 0.5,
       renderCell: (params) => (
         <div>
+        <Button 
+          onClick={() => handleView(params.row)}
+          sx={{ color: theme.palette.background.light }}
+        >
+          <Visibility color={theme.palette.background.light} />
+        </Button>
           <Button 
             onClick={() => handleEdit(params.row)}
             sx={{ color: theme.palette.background.light }}
@@ -138,7 +161,7 @@ const Tournaments = () => {
       if (userConfirmed) {
         setProcessing(true);
         try {
-          const response = await deleteFeed(id).unwrap();
+          const response = await deleteTournament(id).unwrap();
           if(response.error){
             alert(response.error);
           }else{
@@ -273,7 +296,7 @@ const Tournaments = () => {
         }}
       >
         
-        {/* <DataGrid
+        <DataGrid
           loading={isLoading || !data}
           getRowId={(row) => row._id}
           rows={data ? data : []}
@@ -288,12 +311,142 @@ const Tournaments = () => {
           }}
           autoHeight 
           disableSelectionOnClick 
-        /> */}
+        />
       </Box>
     )}
-    {currentTab === 1 && <div>Live Tournaments Content</div>}
-    {currentTab === 2 && <div>Upcoming Tournaments Content</div>}
-    {currentTab === 3 && <div>Completed Tournaments Content</div>}
+    {currentTab === 1 && (
+      <Box
+      mt="40px"
+      mb="50px"
+      sx={{
+        overflowX: 'auto',
+        width: '100%',
+        "& .MuiDataGrid-columnHeaders": {
+          backgroundColor: theme.palette.background.alt,
+          color: theme.palette.secondary[100],
+          borderBottom: "none",
+        },
+        "& .MuiDataGrid-footerContainer": {
+          backgroundColor: theme.palette.background.alt,
+          color: theme.palette.secondary[100],
+          borderTop: "none",
+        },
+        "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+          color: `${theme.palette.secondary[200]} !important`,
+        },
+      }}
+    >
+      
+      <DataGrid
+        loading={isLoading || !data}
+        getRowId={(row) => row._id}
+        rows={data ? data : []}
+        columns={columns}
+        pageSize={8}
+        rowsPerPageOptions={[8, 16, 32, 64]}
+        localeText={{
+          footerTotalVisibleRows: (visibleCount, totalCount) => 
+            `${visibleCount} de ${totalCount}`,
+          footerRowSelected: (count) => 
+            `${count} fila(s) seleccionada(s)`,
+        }}
+        autoHeight 
+        disableSelectionOnClick 
+      />
+    </Box>
+    )}
+    {currentTab === 2 && (
+      <Box
+      mt="40px"
+      mb="50px"
+      sx={{
+        overflowX: 'auto',
+        width: '100%',
+        "& .MuiDataGrid-columnHeaders": {
+          backgroundColor: theme.palette.background.alt,
+          color: theme.palette.secondary[100],
+          borderBottom: "none",
+        },
+        "& .MuiDataGrid-footerContainer": {
+          backgroundColor: theme.palette.background.alt,
+          color: theme.palette.secondary[100],
+          borderTop: "none",
+        },
+        "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+          color: `${theme.palette.secondary[200]} !important`,
+        },
+        '@media (max-width: 600px)': {
+          '& .MuiDataGrid-root': {
+            minWidth: '960px',
+          },
+        },
+      }}
+    >
+      
+      <DataGrid
+        loading={isLoading || !data}
+        getRowId={(row) => row._id}
+        rows={data ? data : []}
+        columns={columns}
+        pageSize={8}
+        rowsPerPageOptions={[8, 16, 32, 64]}
+        localeText={{
+          footerTotalVisibleRows: (visibleCount, totalCount) => 
+            `${visibleCount} de ${totalCount}`,
+          footerRowSelected: (count) => 
+            `${count} fila(s) seleccionada(s)`,
+        }}
+        autoHeight 
+        disableSelectionOnClick 
+      />
+    </Box>
+    )}
+    {currentTab === 3 && (
+      <Box
+      mt="40px"
+      mb="50px"
+      sx={{
+        overflowX: 'auto',
+        width: '100%',
+        "& .MuiDataGrid-columnHeaders": {
+          backgroundColor: theme.palette.background.alt,
+          color: theme.palette.secondary[100],
+          borderBottom: "none",
+        },
+        "& .MuiDataGrid-footerContainer": {
+          backgroundColor: theme.palette.background.alt,
+          color: theme.palette.secondary[100],
+          borderTop: "none",
+        },
+        "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+          color: `${theme.palette.secondary[200]} !important`,
+        },
+        '@media (max-width: 600px)': {
+          '& .MuiDataGrid-root': {
+            minWidth: '960px',
+          },
+        },
+      }}
+    >
+      
+      <DataGrid
+        loading={isLoading || !data}
+        getRowId={(row) => row._id}
+        rows={data ? data : []}
+        columns={columns}
+        pageSize={8}
+        rowsPerPageOptions={[8, 16, 32, 64]}
+        localeText={{
+          footerTotalVisibleRows: (visibleCount, totalCount) => 
+            `${visibleCount} de ${totalCount}`,
+          footerRowSelected: (count) => 
+            `${count} fila(s) seleccionada(s)`,
+        }}
+        autoHeight 
+        disableSelectionOnClick 
+      />
+    </Box>
+    )}
       <ToastNotification open={showToast} message={message} severity={severity} hideToast={hideToast} />
     </Box>
   );
