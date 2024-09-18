@@ -29,8 +29,8 @@ cloudinary.config({
 
 // Middlewares
 app.use(cors());
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 app.use(express.static(path.join(__dirname, 'client/build')));
 
 app.use(express.json({ limit: "50mb" })); // To parse JSON data in the req.body
@@ -42,11 +42,19 @@ import userRoutes from "./routes/user.routes.js";
 import postRoutes from "./routes/post.routes.js";
 import messageRoutes from "./routes/message.routes.js";
 import groupRoutes from "./routes/group.routes.js";
+import gameRoutes from "./routes/game.routes.js";
+import tournamentRoutes from "./routes/tournament.routes.js";
+import paymentRoutes from "./routes/payment.routes.js";
+import notificationRoutes from "./routes/notification.routes.js";
 
 app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
 app.use("/messages", messageRoutes);
-app.use("/group", groupRoutes);
+app.use("/groups", groupRoutes);
+app.use("/games", gameRoutes);
+app.use("/tournaments", tournamentRoutes);
+app.use("/payments", paymentRoutes);
+app.use("/notifications", notificationRoutes);
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client/build', 'index.html'));

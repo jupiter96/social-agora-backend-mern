@@ -10,15 +10,14 @@ export const api = createApi({
   reducerPath: "adminApi",
   // tags
   tagTypes: [
-    "User",
-    "Post",
+    "Feeds",
     "Users",
-    "Transactions",
-    "Geography",
-    "Sales",
-    "Admins",
-    "Performance",
-    "Dashboard",
+    "Games",
+    "Groups",
+    "Payments",
+    "Messages",
+    "Notifications",
+    "Tournaments",
   ],
   // endpoints
   endpoints: (build) => ({
@@ -28,16 +27,42 @@ export const api = createApi({
         method: 'POST',
         body: user,
       }),
-      providesTags: ['User'],
+      providesTags: ['Users'],
     }),
+
+
+    //***************    Dashboard   **********************
     getUserStatistics: build.query({
       query: () => "users/getstatistics",
-      providesTags: ["User"],
+      providesTags: ["Users"],
     }),
     getPostStatistics: build.query({
       query: () => "posts/getfeedstatistics",
-      providesTags: ["Post"],
+      providesTags: ["Feeds"],
     }),
+    getGameStatistics: build.query({
+      query: () => "games/getgamestatistics",
+      providesTags: ["Games"],
+    }),
+    getGroupStatistics: build.query({
+      query: () => "groups/getgroupstatistics",
+      providesTags: ["Groups"],
+    }),
+    getNotificationStatistics: build.query({
+      query: () => "notifications/getnotificationstatistics",
+      providesTags: ["Notifications"],
+    }),
+    getPaymentStatistics: build.query({
+      query: () => "payments/getpaymentstatistics",
+      providesTags: ["Payments"],
+    }),
+    getTournamentStatistics: build.query({
+      query: () => "tournaments/gettournamentstatistics",
+      providesTags: ["Tournaments"],
+    }),
+
+
+    //***************    Users   **********************
     getAllusers: build.query({
       query: () => ({
         url: "users/getallusers",
@@ -53,7 +78,7 @@ export const api = createApi({
         method: 'POST',
         body: user,
       }),
-      providesTags: ['User'],
+      providesTags: ['Users'],
     }),
     editUser: build.mutation({
       query: (user) => ({
@@ -64,15 +89,17 @@ export const api = createApi({
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       }),
-      providesTags: ['User'],
+      providesTags: ['Users'],
     }),
     deleteUser: build.mutation({
       query: (id) => ({
         url: `users/deleteuser/${id}`,
         method: 'DELETE',
       }),
-      providesTags: ['User'],
+      providesTags: ['Users'],
     }),
+
+    //***************    Feeds   **********************
     getAllFeeds: build.query({
       query: () => ({
         url: "posts/feed",
@@ -80,7 +107,7 @@ export const api = createApi({
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         }
       }),
-      providesTags: ["Post"],
+      providesTags: ["Feeds"],
     }),
     createFeed: build.mutation({
       query: (feed) => ({
@@ -91,7 +118,7 @@ export const api = createApi({
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       }),
-      providesTags: ['Post'],
+      providesTags: ['Feeds'],
     }),
     editFeed: build.mutation({
       query: (feed) => ({
@@ -102,7 +129,7 @@ export const api = createApi({
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       }),
-      providesTags: ['Post'],
+      providesTags: ['Feeds'],
     }),
     deleteFeed: build.mutation({
       query: (id) => ({
@@ -112,7 +139,190 @@ export const api = createApi({
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       }),
-      providesTags: ['Post'],
+      providesTags: ['Feeds'],
+    }),
+
+    //***************    Games   **********************
+    getAllGames: build.query({
+      query: () => ({
+        url: "games/getgames",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        }
+      }),
+      providesTags: ["Games"],
+    }),
+    createGame: build.mutation({
+      query: (game) => ({
+        url: 'games/create',
+        method: 'POST',
+        body: game,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      providesTags: ['Games'],
+    }),
+    editGame: build.mutation({
+      query: (game) => ({
+        url: `games/editgame/${game.id}`,
+        method: 'PUT',
+        body: game,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      providesTags: ['Games'],
+    }),
+    deleteGame: build.mutation({
+      query: (id) => ({
+        url: `games/${id}`,
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      providesTags: ['Games'],
+    }),
+
+    //***************    Groups   **********************
+    getAllGroups: build.query({
+      query: () => ({
+        url: "groups/getgroups",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        }
+      }),
+      providesTags: ["Groups"],
+    }),
+    createGroup: build.mutation({
+      query: (group) => ({
+        url: 'groups/create',
+        method: 'POST',
+        body: group,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      providesTags: ['Groups'],
+    }),
+    editGroup: build.mutation({
+      query: (group) => ({
+        url: `groups/editgroup/${group.id}`,
+        method: 'PUT',
+        body: group,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      providesTags: ['Groups'],
+    }),
+    deleteGroup: build.mutation({
+      query: (id) => ({
+        url: `groups/${id}`,
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      providesTags: ['Groups'],
+    }),
+
+    //***************    Notifications   **********************
+    getAllNotifications: build.query({
+      query: () => ({
+        url: "notifications/getnotifications",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        }
+      }),
+      providesTags: ["Notifications"],
+    }),
+    createNotification: build.mutation({
+      query: (notification) => ({
+        url: 'notifications/create',
+        method: 'POST',
+        body: notification,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      providesTags: ['Notifications'],
+    }),
+    editNotification: build.mutation({
+      query: (notification) => ({
+        url: `notifications/editnotification/${notification.id}`,
+        method: 'PUT',
+        body: notification,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      providesTags: ['Notifications'],
+    }),
+    deleteNotification: build.mutation({
+      query: (id) => ({
+        url: `notifications/${id}`,
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      providesTags: ['Notifications'],
+    }),
+
+    //***************    Payments   **********************
+    getAllPayments: build.query({
+      query: () => ({
+        url: "payments/getpayments",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        }
+      }),
+      providesTags: ["Payments"],
+    }),
+
+    //***************    tournaments   **********************
+    getAllTournaments: build.query({
+      query: () => ({
+        url: "tournaments/gettournaments",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        }
+      }),
+      providesTags: ["Tournaments"],
+    }),
+    createTournament: build.mutation({
+      query: (tournament) => ({
+        url: 'tournaments/create',
+        method: 'POST',
+        body: tournament,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      providesTags: ['Tournaments'],
+    }),
+    editTournament: build.mutation({
+      query: (tournament) => ({
+        url: `tournaments/edittournament/${tournament.id}`,
+        method: 'PUT',
+        body: tournament,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      providesTags: ['Tournaments'],
+    }),
+    deleteTournament: build.mutation({
+      query: (id) => ({
+        url: `tournaments/${id}`,
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      providesTags: ['Tournaments'],
     }),
   }),
 });
@@ -120,15 +330,45 @@ export const api = createApi({
 // export api endpoints
 export const {
   useGetLoginMutation,
+
   useGetUserStatisticsQuery,
   useGetPostStatisticsQuery,
+  useGetGameStatisticsQuery,
+  useGetGroupStatisticsQuery,
+  useGetNotificationStatisticsQuery,
+  useGetPaymentStatisticsQuery,
+  useGetTournamentStatisticsQuery,
+
   useGetAllusersQuery,
   useCreateUserMutation,
   useEditUserMutation,
   useDeleteUserMutation,
+
   useGetAllFeedsQuery,
   useCreateFeedMutation,
   useEditFeedMutation,
   useDeleteFeedMutation,
+  
+  useGetAllGamesQuery,
+  useCreateGameMutation,
+  useEditGameMutation,
+  useDeleteGameMutation,
+  
+  useGetAllGroupsQuery,
+  useCreateGroupMutation,
+  useEditGroupMutation,
+  useDeleteGroupMutation,
+  
+  useGetAllNotificationsQuery,
+  useCreateNotificationMutation,
+  useEditNotificationMutation,
+  useDeleteNotificationMutation,
+  
+  useGetAllPaymentsQuery,
+  
+  useGetAllTournamentsQuery,
+  useCreateTournamentMutation,
+  useEditTournamentMutation,
+  useDeleteTournamentMutation,
 
 } = api;

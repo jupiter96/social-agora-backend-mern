@@ -60,7 +60,7 @@ const AddFeedModal = ({ open, onClose, update, processHandle, severityHandle, me
     e.preventDefault();
     processHandle(true);
     if(update?._id){
-      if(formData.username !== '' && formData.text !== ''){
+      if(formData.postedBy !== '' && formData.text !== ''){
         try {
           const response = await editFeed(formData).unwrap();
           if(response.error){
@@ -192,7 +192,7 @@ const AddFeedModal = ({ open, onClose, update, processHandle, severityHandle, me
 
                 }}
                 renderInput={(params) => (
-                  <TextField {...params} label="Select User" variant="outlined" />
+                  <TextField {...params} label={t("selectUser")} variant="outlined" />
                 )}
                 
                 filterOptions={(options, { inputValue }) => {

@@ -7,7 +7,7 @@ import {
 } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
 
-import { useGetAllFeedsQuery, useDeleteFeedMutation } from "state/api";
+import { useGetAllGroupsQuery, useDeleteGroupMutation } from "state/api";
 import { Header, FlexBetween, ToastNotification } from "components";
 import { useTranslation } from 'react-i18next';
 import AddGroupModal from './AddGroupModal';
@@ -16,8 +16,8 @@ const Groups = () => {
   
   const theme = useTheme();
   
-  const { data, isLoading, refetch } = useGetAllFeedsQuery();
-  const [ deleteFeed ] = useDeleteFeedMutation();
+  const { data, isLoading, refetch } = useGetAllGroupsQuery();
+  const [ deleteGroup ] = useDeleteGroupMutation();
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState(false);
@@ -52,12 +52,12 @@ const Groups = () => {
       flex: 0.5,
     },
     {
-      field: "text",
-      headerName: t("text"),
+      field: "group_name",
+      headerName: t("name"),
       flex: 0.5,
     },
     {
-      field: 'img',
+      field: 'imgUrl',
       headerName: t("media"),
       width: 100,
       renderCell: (params) => (
@@ -69,40 +69,31 @@ const Groups = () => {
       ),
     },
     {
-      field: "postedBy",
-      headerName: t("postedby"),
+      field: "adminUser",
+      headerName: t("admin"),
       flex: 0.5,
     },
-    
     {
-      field: 'likes',
-      headerName: t("likes"),
+      field: "game",
+      headerName: t("game"),
+      flex: 0.5,
+    },
+    {
+      field: "description",
+      headerName: t("description"),
+      flex: 0.5,
+    },
+    {
+      field: 'members',
+      headerName: t("member"),
       flex: 0.2,
       renderCell: (params) => (
-        <h4>{params.value?.length}</h4>
-      ),
-    },
-    
-    {
-      field: 'replies',
-      headerName: t("replies"),
-      flex: 0.2,
-      renderCell: (params) => (
-        <h4>{params.value?.length}</h4>
-      ),
-    },
-    
-    {
-      field: 'createdAt',
-      headerName: t("createdAt"),
-      flex: 0.4,
-      renderCell: (params) => (
-        <h4>{params.value?.split("T")[0]}</h4>
+        <h4>{params.value.length}</h4>
       ),
     },
     {
       field: "actions",
-      headerName: "Actions",
+      headerName: t("action"),
       flex: 0.5,
       renderCell: (params) => (
         <div>
@@ -134,7 +125,7 @@ const Groups = () => {
       if (userConfirmed) {
         setProcessing(true);
         try {
-          const response = await deleteFeed(id).unwrap();
+          const response = await deleteGroup(id).unwrap();
           if(response.error){
             alert(response.error);
           }else{
@@ -247,7 +238,7 @@ const Groups = () => {
         }}
       >
         
-        {/* <DataGrid
+        <DataGrid
           loading={isLoading || !data}
           getRowId={(row) => row._id}
           rows={data ? data : []}
@@ -262,7 +253,7 @@ const Groups = () => {
           }}
           autoHeight 
           disableSelectionOnClick 
-        /> */}
+        />
       </Box>
       <ToastNotification open={showToast} message={message} severity={severity} hideToast={hideToast} />
     </Box>

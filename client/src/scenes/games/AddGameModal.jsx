@@ -8,36 +8,29 @@ import {
   TextField,
   IconButton,
   Box,
-  Autocomplete,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
   useTheme
 } from '@mui/material';
 import { PhotoCamera  } from '@mui/icons-material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { useCreateFeedMutation, useEditFeedMutation, useGetAllusersQuery } from "state/api";
+import { useCreateGameMutation, useEditGameMutation } from "state/api";
 
 const AddGameModal = ({ open, onClose, update, processHandle, severityHandle, messageHandle, showToastHandle }) => {
   const [formData, setFormData] = useState({
     id: update?._id ? update._id:'',
-    text: update?.text ? update.text:'',
-    postedBy: update?.postedBy ? update.postedBy:'',
-    img: update?.img ? update.img:null,
-    createdAt: update?.createdAt ? dayjs(update.createdAt):dayjs().toISOString(),
+    game_name: update?.game_name ? update.game_name:'',
+    category: update?.category ? update.category:'',
+    imgUrl: update?.imgUrl ? update.imgUrl:null,
+    description: update?.description ? update.description:'',
   });
   const [imagePreview, setImagePreview] = useState(null);
   const theme = useTheme();
   const { t } = useTranslation();
-  const [createFeed] = useCreateFeedMutation();
-  const [editFeed] = useEditFeedMutation();
-  const { data, refetch } = useGetAllusersQuery();
-  const [selectedUser, setSelectedUser] = useState(null);
-
-  const handleDateChange = (newValue) => {
-    setFormData((prev) => ({ ...prev, createdAt: dayjs(newValue).toISOString() }))
-  };
+  const [createGame] = useCreateGameMutation();
+  const [editGame] = useEditGameMutation();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,7 +43,7 @@ const AddGameModal = ({ open, onClose, update, processHandle, severityHandle, me
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
-        setFormData((prevData) => ({ ...prevData, img: reader.result }));
+        setFormData((prevData) => ({ ...prevData, imgUrl: reader.result }));
       };
       reader.readAsDataURL(file);
     }
@@ -60,9 +53,9 @@ const AddGameModal = ({ open, onClose, update, processHandle, severityHandle, me
     e.preventDefault();
     processHandle(true);
     if(update?._id){
-      if(formData.username !== '' && formData.text !== ''){
+      if(formData.game_name !== '' && formData.imgUrl !== '' && formData.category !== ''){
         try {
-          const response = await editFeed(formData).unwrap();
+          const response = await editGame(formData).unwrap();
           if(response.error){
             alert(response.error);
           }else{
@@ -84,9 +77,9 @@ const AddGameModal = ({ open, onClose, update, processHandle, severityHandle, me
           alert("fill out all!")
       }
     }else{
-      if(formData.text !== '' && formData.postedBy !== ''){
+      if(formData.game_name !== '' && formData.imgUrl !== '' && formData.category !== ''){
         try {
-          const response = await createFeed(formData).unwrap();
+          const response = await createGame(formData).unwrap();
           if(response.error){
             alert(response.error);
           }else{
@@ -114,20 +107,18 @@ const AddGameModal = ({ open, onClose, update, processHandle, severityHandle, me
     if(update){
       setFormData({
         id: update?._id ? update._id:'',
-        text: update?.text ? update.text:'',
-        postedBy: update?.postedBy ? update.postedBy:'',
-        img: update?.img ? update.img:null,
-        createdAt: update?.createdAt ? dayjs(update.createdAt):dayjs().toISOString(),
+        game_name: update?.game_name ? update.game_name:'',
+        category: update?.category ? update.category:'',
+        imgUrl: update?.imgUrl ? update.imgUrl:null,
+        description: update?.description ? update.description:'',
       });
-      setImagePreview(update?.img ? update.img:null);
+      setImagePreview(update?.imgUrl ? update.imgUrl:null);
     }
-    refetch();
-  }, [update, refetch])
+  }, [update])
   return (
     <Dialog open={open} onClose={onClose}>
       {update?._id ? (<DialogTitle>{t("edit")} {t("game")}</DialogTitle>) : (<DialogTitle>{t("addGame")}</DialogTitle>)}
       <DialogContent>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
           <form onSubmit={handleSubmit}>
             
           {imagePreview && (
@@ -164,63 +155,37 @@ const AddGameModal = ({ open, onClose, update, processHandle, severityHandle, me
             </label>
           </Box>
             <TextField
-              label={t("text")}
-              name="text"
+              label={t("title")}
+              name="game_name"
               fullWidth
               margin="normal"
-              value={formData.text}
+              value={formData.game_name}
               onChange={handleChange}
               multiline
-              rows={4}
+              rows={2}
             />
-            {update?._id ? (<TextField
-              label={t("postedBy")}
-              name="postedBy"
-              type="text"
+            <FormControl fullWidth margin="normal">
+              <InputLabel>{t("category")}</InputLabel>
+              <Select
+                name='category'
+                value={formData.category}
+                onChange={handleChange}
+              >
+                <MenuItem value="Mobile">{t("mobile")}</MenuItem>
+                <MenuItem value="PC">{t("pc")}</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              label={t("description")}
+              name="description"
               fullWidth
               margin="normal"
-              value={data.find(user => user._id === formData.postedBy) ? data.find(user => user._id === formData.postedBy).name + " ( " + formData.postedBy + " )" : ""}
+              value={formData.description}
               onChange={handleChange}
-              disabled
-            />):(
-              <Autocomplete
-                options={data? data: []}
-                getOptionLabel={(option) => option.name}
-                onChange={(event, newValue) => {
-                  setSelectedUser(newValue);
-                  setFormData((prevData) => ({ ...prevData, postedBy: newValue._id }));
-
-                }}
-                renderInput={(params) => (
-                  <TextField {...params} label="Select User" variant="outlined" />
-                )}
-                
-                filterOptions={(options, { inputValue }) => {
-                  return options.filter((option) =>
-                    option.name.toLowerCase().includes(inputValue.toLowerCase())
-                  );
-                }}
-                
-                value={selectedUser}
-                isOptionEqualToValue={(option, value) => 
-                  option.id === value.id}
-              />
-            )}
-            <Box display="flex" alignItems="center" marginTop={2}>
-              <DatePicker
-                label={t("createdAt")}
-                value={update?.createdAt ? dayjs(update.createdAt):dayjs()}
-                onChange={(newValue) => handleDateChange(newValue)}
-                slotProps={{
-                  textField: {
-                    variant: 'outlined',
-                    fullWidth: true,
-                  },
-                }}
-              />
-            </Box>
+              multiline
+              rows={3}
+            />
           </form>
-        </LocalizationProvider>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} sx={{borderRadius: 50}} variant="contained">{t('cancel')}</Button>

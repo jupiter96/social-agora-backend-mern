@@ -6,6 +6,11 @@ const groupSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    game: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Game",
+      required: true,
+    },
     imgUrl: {
       type: String,
       required: true,
@@ -19,15 +24,10 @@ const groupSchema = mongoose.Schema(
       ref: "User",
       required: true,
     },
-    members: [
-      {
-        member: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-          required: true,
-        },
-      },
-    ],
+    members: {
+      type: [mongoose.Schema.Types.ObjectId],
+      default: [],
+    },
   },
   {
     timestamps: true,

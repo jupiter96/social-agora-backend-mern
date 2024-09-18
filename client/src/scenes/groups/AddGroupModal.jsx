@@ -9,35 +9,36 @@ import {
   IconButton,
   Box,
   Autocomplete,
+  Chip,
   useTheme
 } from '@mui/material';
 import { PhotoCamera  } from '@mui/icons-material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { useCreateFeedMutation, useEditFeedMutation, useGetAllusersQuery } from "state/api";
+import { useCreateGroupMutation, useEditGroupMutation, useGetAllusersQuery, useGetAllGamesQuery } from "state/api";
 
 const AddGroupModal = ({ open, onClose, update, processHandle, severityHandle, messageHandle, showToastHandle }) => {
   const [formData, setFormData] = useState({
     id: update?._id ? update._id:'',
-    text: update?.text ? update.text:'',
-    postedBy: update?.postedBy ? update.postedBy:'',
-    img: update?.img ? update.img:null,
-    createdAt: update?.createdAt ? dayjs(update.createdAt):dayjs().toISOString(),
+    group_name: update?.group_name ? update.group_name:'',
+    game: update?.game ? update.game:'',
+    imgUrl: update?.imgUrl ? update.imgUrl:null,
+    description: update?.description ? update.description:'',
+    adminUser: update?.adminUser ? update.adminUser:'',
+    members: update?.members ? update.members:[],
   });
   const [imagePreview, setImagePreview] = useState(null);
   const theme = useTheme();
   const { t } = useTranslation();
-  const [createFeed] = useCreateFeedMutation();
-  const [editFeed] = useEditFeedMutation();
-  const { data, refetch } = useGetAllusersQuery();
+  const [createGroup] = useCreateGroupMutation();
+  const [editGroup] = useEditGroupMutation();
+  const { data: getAllusers, refetch } = useGetAllusersQuery();
+  const { data: getAllGames } = useGetAllGamesQuery();
   const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedGame, setSelectedGame] = useState(null);
 
-  const handleDateChange = (newValue) => {
-    setFormData((prev) => ({ ...prev, createdAt: dayjs(newValue).toISOString() }))
-  };
+  const userdata = getAllusers;
+  const gamedata = getAllGames;
+  const [selectedMember, setSelectedMember] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,7 +51,7 @@ const AddGroupModal = ({ open, onClose, update, processHandle, severityHandle, m
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
-        setFormData((prevData) => ({ ...prevData, img: reader.result }));
+        setFormData((prevData) => ({ ...prevData, imgUrl: reader.result }));
       };
       reader.readAsDataURL(file);
     }
@@ -60,9 +61,9 @@ const AddGroupModal = ({ open, onClose, update, processHandle, severityHandle, m
     e.preventDefault();
     processHandle(true);
     if(update?._id){
-      if(formData.username !== '' && formData.text !== ''){
+      if(formData.group_name !== '' && formData.game !== '' && formData.adminUser !== ''){
         try {
-          const response = await editFeed(formData).unwrap();
+          const response = await editGroup(formData).unwrap();
           if(response.error){
             alert(response.error);
           }else{
@@ -84,9 +85,9 @@ const AddGroupModal = ({ open, onClose, update, processHandle, severityHandle, m
           alert("fill out all!")
       }
     }else{
-      if(formData.text !== '' && formData.postedBy !== ''){
+      if(formData.group_name !== '' && formData.game !== '' && formData.adminUser !== ''){
         try {
-          const response = await createFeed(formData).unwrap();
+          const response = await createGroup(formData).unwrap();
           if(response.error){
             alert(response.error);
           }else{
@@ -114,20 +115,22 @@ const AddGroupModal = ({ open, onClose, update, processHandle, severityHandle, m
     if(update){
       setFormData({
         id: update?._id ? update._id:'',
-        text: update?.text ? update.text:'',
-        postedBy: update?.postedBy ? update.postedBy:'',
-        img: update?.img ? update.img:null,
-        createdAt: update?.createdAt ? dayjs(update.createdAt):dayjs().toISOString(),
+        group_name: update?.group_name ? update.group_name:'',
+        game: update?.game ? update.game:'',
+        imgUrl: update?.imgUrl ? update.imgUrl:null,
+        description: update?.description ? update.description:'',
+        adminUser: update?.adminUser ? update.adminUser:'',
+        members: update?.members ? update.members:[],
       });
-      setImagePreview(update?.img ? update.img:null);
+      setImagePreview(update?.imgUrl ? update.imgUrl:null);
+      setSelectedMember(userdata?.filter(user => update?.members?.includes(user._id)));
     }
     refetch();
-  }, [update, refetch])
+  }, [update, refetch, userdata])
   return (
     <Dialog open={open} onClose={onClose}>
       {update?._id ? (<DialogTitle>{t("edit")} {t("group")}</DialogTitle>) : (<DialogTitle>{t("addGroup")}</DialogTitle>)}
       <DialogContent>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
           <form onSubmit={handleSubmit}>
             
           {imagePreview && (
@@ -164,63 +167,126 @@ const AddGroupModal = ({ open, onClose, update, processHandle, severityHandle, m
             </label>
           </Box>
             <TextField
-              label={t("text")}
-              name="text"
+              label={t("name")}
+              name="group_name"
               fullWidth
               margin="normal"
-              value={formData.text}
+              value={formData.group_name}
+              onChange={handleChange}
+              multiline
+              rows={2}
+            />
+            <TextField
+              label={t("description")}
+              name="description"
+              fullWidth
+              margin="normal"
+              value={formData.description}
               onChange={handleChange}
               multiline
               rows={4}
             />
             {update?._id ? (<TextField
-              label={t("postedBy")}
-              name="postedBy"
+              label={t("admin")}
+              name="adminUser"
               type="text"
               fullWidth
               margin="normal"
-              value={data.find(user => user._id === formData.postedBy) ? data.find(user => user._id === formData.postedBy).name + " ( " + formData.postedBy + " )" : ""}
+              value={userdata.find(user => user._id === formData.adminUser) ? userdata.find(user => user._id === formData.adminUser).name + " ( " + formData.adminUser + " )" : ""}
               onChange={handleChange}
               disabled
             />):(
+              <Box marginTop={2}>
+                <Autocomplete
+                  options={userdata? userdata: []}
+                  getOptionLabel={(option) => option.name}
+                  onChange={(event, newValue) => {
+                    setSelectedUser(newValue);
+                    setFormData((prevData) => ({ ...prevData, adminUser: newValue._id }));
+
+                  }}
+                  renderInput={(params) => (
+                    <TextField {...params} label={t("selectUser")} variant="outlined" />
+                  )}
+                  
+                  filterOptions={(options, { inputValue }) => {
+                    return options?.filter((option) =>
+                      option?.name.toLowerCase().includes(inputValue.toLowerCase())
+                    );
+                  }}
+                  
+                  value={selectedUser}
+                  isOptionEqualToValue={(option, value) => 
+                    option.id === value.id}
+                />
+              </Box>
+            )}
+
+          {update?._id ? (<TextField
+              label={t("game")}
+              name="game"
+              type="text"
+              fullWidth
+              margin="normal"
+              value={gamedata.find(game => game._id === formData.game) ? gamedata.find(game => game._id === formData.game).game_name + " ( " + formData.game + " )" : ""}
+              onChange={handleChange}
+              disabled
+            />):(
+              <Box marginTop={2}>
               <Autocomplete
-                options={data? data: []}
-                getOptionLabel={(option) => option.name}
+                options={gamedata? gamedata: []}
+                getOptionLabel={(option) => option.game_name}
                 onChange={(event, newValue) => {
-                  setSelectedUser(newValue);
-                  setFormData((prevData) => ({ ...prevData, postedBy: newValue._id }));
+                  setSelectedGame(newValue);
+                  setFormData((prevData) => ({ ...prevData, game: newValue._id }));
 
                 }}
                 renderInput={(params) => (
-                  <TextField {...params} label="Select User" variant="outlined" />
+                  <TextField {...params} label={t("selectGame")} variant="outlined" />
                 )}
                 
                 filterOptions={(options, { inputValue }) => {
-                  return options.filter((option) =>
-                    option.name.toLowerCase().includes(inputValue.toLowerCase())
+                  return options?.filter((option) =>
+                    option?.game_name.toLowerCase().includes(inputValue.toLowerCase())
                   );
                 }}
                 
-                value={selectedUser}
+                value={selectedGame}
                 isOptionEqualToValue={(option, value) => 
                   option.id === value.id}
               />
+              </Box>
             )}
-            <Box display="flex" alignItems="center" marginTop={2}>
-              <DatePicker
-                label={t("createdAt")}
-                value={update?.createdAt ? dayjs(update.createdAt):dayjs()}
-                onChange={(newValue) => handleDateChange(newValue)}
-                slotProps={{
-                  textField: {
-                    variant: 'outlined',
-                    fullWidth: true,
-                  },
-                }}
-              />
-            </Box>
+              <Box marginTop={2}>
+                <Autocomplete
+                  multiple
+                  options={userdata? userdata: []}
+                  getOptionLabel={(option) => option.name}
+                  onChange={(event, newValue) => {
+                    setSelectedMember(newValue);
+                    setFormData((prevData) => ({ ...prevData,
+                      members: newValue.map(user => user._id),}));
+
+                  }}
+                  renderInput={(params) => (
+                    <TextField {...params} label={t("selectUser")} variant="outlined" />
+                  )}
+                  
+                  filterOptions={(options, { inputValue }) => {
+                    return options?.filter((option) =>
+                      option?.name.toLowerCase().includes(inputValue.toLowerCase())
+                    );
+                  }}
+                  
+                  value={selectedMember || []}
+                  renderTags={(value, getTagProps) =>
+                    value.map((option, index) => (
+                      <Chip variant="outlined" label={option.name} {...getTagProps({ index })} />
+                    ))
+                  }
+                />
+              </Box>
           </form>
-        </LocalizationProvider>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} sx={{borderRadius: 50}} variant="contained">{t('cancel')}</Button>

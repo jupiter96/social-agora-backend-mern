@@ -101,7 +101,7 @@ const Payments = () => {
     },
     {
       field: "actions",
-      headerName: "Actions",
+      headerName: t("action"),
       flex: 0.5,
       renderCell: (params) => (
         <div>

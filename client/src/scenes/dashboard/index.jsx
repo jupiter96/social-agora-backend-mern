@@ -18,7 +18,14 @@ import {
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useTranslation } from 'react-i18next';
-import { useGetUserStatisticsQuery, useGetPostStatisticsQuery } from "state/api";
+import { 
+  useGetUserStatisticsQuery, 
+  useGetPostStatisticsQuery,
+  useGetGameStatisticsQuery,
+  useGetGroupStatisticsQuery,
+  useGetPaymentStatisticsQuery,
+  useGetTournamentStatisticsQuery,
+ } from "state/api";
 import { useSelector } from "react-redux";
 
 // import { useGetDashboardQuery } from "state/api";
@@ -35,9 +42,17 @@ const Dashboard = () => {
   const theme = useTheme();
   const { data: getUserStatistics } = useGetUserStatisticsQuery();
   const { data: getPostStatistics } = useGetPostStatisticsQuery();
+  const { data: getGameStatistics } = useGetGameStatisticsQuery();
+  const { data: getGroupStatistics } = useGetGroupStatisticsQuery();
+  const { data: getPaymentStatistics } = useGetPaymentStatisticsQuery();
+  const { data: getTournamentStatistics } = useGetTournamentStatisticsQuery();
   const data = {
     ...getUserStatistics,
     ...getPostStatistics,
+    ...getGameStatistics,
+    ...getGroupStatistics,
+    ...getPaymentStatistics,
+    ...getTournamentStatistics
   };
   const { t } = useTranslation();
   // is large desktop screen
@@ -120,7 +135,7 @@ const Dashboard = () => {
         {/* Total Customers */}
         <StatBox
           title={t("totalUsers")}
-          value={data && data.totalUser}
+          value={data ? data.totalUser : 0}
           increase={14}
           description={t("lastMonth")}
           icon={
@@ -133,7 +148,7 @@ const Dashboard = () => {
         {/* Sales Today */}
         <StatBox
           title={t("totalGames")}
-          value={data?.todayStats ? data.todayStats.totalSales: 128}
+          value={data?.gameCount ? data.gameCount: 0}
           increase={21}
           description={t("lastMonth")}
           icon={
@@ -145,7 +160,7 @@ const Dashboard = () => {
         {/* Monthly Sales */}
         <StatBox
           title={t("totalGroups")}
-          value={data?.thisMonthStats ? data.thisMonthStats.totalSales: 24}
+          value={data?.groupCount ? data.groupCount: 0}
           increase={-5}
           description={t("lastMonth")}
           icon={
@@ -170,7 +185,7 @@ const Dashboard = () => {
         {/* Monthly Sales */}
         <StatBox
           title={t("totalPayments")}
-          value={data.thisMonthStats ? `$${data.thisMonthStats.totalSales}`: "$2430"}
+          value={data.paymentCount ? `$${data.paymentCount}`: "$0"}
           increase={32}
           description={t("lastMonth")}
           icon={
@@ -194,7 +209,7 @@ const Dashboard = () => {
         {/* Yearly Sales */}
         <StatBox
           title={t("totalTournaments")}
-          value={data.yearlySalesTotal ? data.yearlySalesTotal:7}
+          value={data.tournamentCount ? data.tournamentCount:0}
           increase={-13}
           description={t("lastMonth")}
           icon={
