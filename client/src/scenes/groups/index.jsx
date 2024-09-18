@@ -88,7 +88,7 @@ const Groups = () => {
       headerName: t("member"),
       flex: 0.2,
       renderCell: (params) => (
-        <h4>{params.value.length}</h4>
+        <h4>{params.value?.length || 0}</h4>
       ),
     },
     {

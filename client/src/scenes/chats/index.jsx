@@ -247,10 +247,10 @@ const Chats = () => {
         }}
       >
         
-        {/* <DataGrid
+        <DataGrid
           loading={isLoading || !data}
           getRowId={(row) => row._id}
-          rows={data ? data : []}
+          rows={data ? [] : []}
           columns={columns}
           pageSize={8}
           rowsPerPageOptions={[8, 16, 32, 64]}
@@ -262,7 +262,7 @@ const Chats = () => {
           }}
           autoHeight 
           disableSelectionOnClick 
-        /> */}
+        />
       </Box>
       <ToastNotification open={showToast} message={message} severity={severity} hideToast={hideToast} />
     </Box>
