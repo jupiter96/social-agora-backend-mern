@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useRef} from "react";
 import {
   DownloadOutlined,
   SportsEsports,
@@ -33,6 +33,11 @@ import {
   OverviewChart,
   StatBox,
 } from "components";
+import jsPDF from 'jspdf';
+import ExcelJS from 'exceljs';
+import 'jspdf-autotable';
+import html2canvas from 'html2canvas';
+import { saveAs } from 'file-saver';
 
 const Dashboard = () => {
   // theme
@@ -52,9 +57,60 @@ const Dashboard = () => {
     ...getTournamentStatistics
   };
   const { t } = useTranslation();
+  const chartRef = useRef();
   // is large desktop screen
   const isNonMediumScreen = useMediaQuery("(min-width: 1200px)");
   const currentUser = useSelector((state) => state.global.userInfo);
+
+  const downloadPDF = async(data) => {
+    const canvas = await html2canvas(chartRef.current);
+    const imgData = canvas.toDataURL('image/png');
+    const doc = new jsPDF();
+    doc.text("Informes", 14, 8);
+    
+    doc.addImage(imgData, 'PNG', 14, 30, 180, 100); 
+    // Create a table from the data
+    doc.autoTable({
+      head: [[t("totalUsers"), t("totalGames"), t("totalGroups"), t("totalFeeds"), t("totalPayments"), t("totalTournaments")]],
+      body: [
+        [data.totalUser, data.gameCount, data.groupCount, data.postCount, data.totalAmount, data.tournamentCount],
+      ],
+    });
+  
+    doc.save(`${Date.now()}_Informes.pdf`);
+  };
+
+  const downloadExcel = async(data) => {
+    
+    const canvas = await html2canvas(chartRef.current);
+    const imgData = canvas.toDataURL('image/png');
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Informes');
+
+    // Add data to Excel
+    worksheet.addRow([t("totalUsers"), t("totalGames"), t("totalGroups"), t("totalFeeds"), t("totalPayments"), t("totalTournaments")]);
+    worksheet.addRow([data.totalUser, data.gameCount, data.groupCount, data.postCount, data.totalAmount, data.tournamentCount]);
+
+    // Add chart image to Excel
+    const imageId = workbook.addImage({
+      base64: imgData,
+      extension: 'png',
+    });
+
+    // Add the image to the worksheet
+    worksheet.addImage(imageId, {
+      tl: { col: 0, row: 3 }, // Adjust the position as needed
+      ext: { width: 500, height: 300 }, // Adjust size as needed
+    });
+
+    // Write the workbook to a buffer
+    const buffer = await workbook.xlsx.writeBuffer();
+    
+    // Create a Blob from the buffer and save it
+    const blob = new Blob([buffer], { type: 'application/octet-stream' });
+    saveAs(blob, `${Date.now()}_Informes.xlsx`);
+  };
 
   return (
     <Box m="1.5rem 2.5rem">
@@ -63,9 +119,10 @@ const Dashboard = () => {
         <Header title={t("dashboard")} subtitle={`${t('welcome') }, ${currentUser.name}`} />
 
         {/* Content */}
-        <Box>
+        <Box sx={{flexDirection: 'row', gap: 10}}>
           {/* Download Reports */}
           <Button
+            onClick={()=>downloadExcel(data)}
             sx={{
               backgroundColor: theme.palette.secondary.light,
               color: theme.palette.background.alt,
@@ -80,7 +137,25 @@ const Dashboard = () => {
             }}
           >
             <DownloadOutlined sx={{ mr: "10px" }} />
-            {t("download")}
+            {t("Excel")}
+          </Button>
+          <Button
+            onClick={()=>downloadPDF(data)}
+            sx={{
+              backgroundColor: theme.palette.secondary.light,
+              color: theme.palette.background.alt,
+              fontSize: "14px",
+              fontWeight: "bold",
+              padding: "10px 20px",
+              borderRadius: 50,
+              "&:hover": {
+                backgroundColor: theme.palette.background.alt,
+                color: theme.palette.secondary.light,
+              },
+            }}
+          >
+            <DownloadOutlined sx={{ mr: "10px" }} />
+            {t("PDF")}
           </Button>
         </Box>
       </FlexBetween>
@@ -151,7 +226,7 @@ const Dashboard = () => {
         {/* Monthly Sales */}
         <StatBox
           title={t("totalPayments")}
-          value={data.paymentCount ? `$${data.paymentCount}`: "$0"}
+          value={data.totalAmount ? `$${data.totalAmount}`: "$0"}
           increase={32}
           description={t("lastMonth")}
           icon={
@@ -167,6 +242,7 @@ const Dashboard = () => {
           backgroundColor={theme.palette.background.alt}
           p="1rem"
           borderRadius="0.55rem"
+          ref={chartRef}
         >
           <OverviewChart view="sales" isDashboard={true} />
         </Box>

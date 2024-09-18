@@ -13,8 +13,14 @@ const getPayments = async (req, res) => {
 
 const getstatistics = async (req, res) => {
   try {
-    const paymentCount = await Payment.countDocuments();
-    res.status(200).json({paymentCount: paymentCount});
+    const totalAmount = await Payment.aggregate([
+      { $match: { status: "Completed" } },
+      { $group: { _id: null, totalAmount: { $sum: "$amount" } } }
+    ]);
+
+    const total = totalAmount.length > 0 ? totalAmount[0].totalAmount : 0;
+
+    res.status(200).json({ totalAmount: total });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

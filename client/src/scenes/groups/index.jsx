@@ -99,9 +99,9 @@ const Groups = () => {
         <div>
           <Button 
             onClick={() => handleEdit(params.row)}
-            sx={{ color: theme.palette.background.light }}
+            sx={{ color: theme.palette.secondary.light }}
           >
-            <Edit color={theme.palette.background.light} />
+            <Edit color={theme.palette.secondary.light} />
           </Button>
           <Button 
             onClick={() => handleDelete(params.row._id)}
@@ -216,7 +216,9 @@ const Groups = () => {
         mb="50px"
         sx={{
           overflowX: 'auto',
-          width: '100%',
+          justifyItems: 'center',
+          alignItems: 'center',
+          margin: 'auto',
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: theme.palette.background.alt,
             color: theme.palette.secondary[100],
@@ -232,7 +234,7 @@ const Groups = () => {
           },
           '@media (max-width: 600px)': {
             '& .MuiDataGrid-root': {
-              minWidth: '960px',
+              minWidth: '1260px',
             },
           },
         }}

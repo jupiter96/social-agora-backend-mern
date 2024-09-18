@@ -86,9 +86,9 @@ const Games = () => {
         <div>
           <Button 
             onClick={() => handleEdit(params.row)}
-            sx={{ color: theme.palette.background.light }}
+            sx={{ color: theme.palette.secondary.light }}
           >
-            <Edit color={theme.palette.background.light} />
+            <Edit color={theme.palette.secondary.light} />
           </Button>
           <Button 
             onClick={() => handleDelete(params.row._id)}

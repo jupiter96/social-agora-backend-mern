@@ -59,17 +59,17 @@ const Tournaments = () => {
     {
       field: "_id",
       headerName: "ID",
-      flex: 0.5,
+      flex: 0.05,
     },
     {
       field: "title",
       headerName: t("title"),
-      flex: 0.5,
+      flex: 0.1,
     },
     {
       field: 'imgUrl',
       headerName: t("media"),
-      width: 100,
+      flex: 0.1,
       renderCell: (params) => (
         <img
           src={params.value}
@@ -81,28 +81,28 @@ const Tournaments = () => {
     {
       field: "adminUser",
       headerName: t("admin"),
-      flex: 0.5,
+      flex: 0.05,
     },
     {
       field: "type",
       headerName: t("type"),
-      flex: 0.5,
+      flex: 0.1,
     },
     {
       field: "fee",
       headerName: t("fee"),
-      flex: 0.5,
+      flex: 0.05,
     },
     {
       field: "reward",
       headerName: t("reward"),
-      flex: 0.5,
+      flex: 0.05,
     },
     
     {
       field: 'start_time',
       headerName: t("startTime"),
-      flex: 0.4,
+      flex: 0.1,
       renderCell: (params) => (
         <h4>{params.value?.split("T")[0]} {params.value?.split("T")[0].split(".")[0]}</h4>
       ),
@@ -111,7 +111,7 @@ const Tournaments = () => {
     {
       field: 'end_time',
       headerName: t("endTime"),
-      flex: 0.4,
+      flex: 0.1,
       renderCell: (params) => (
         <h4>{params.value?.split("T")[0]} {params.value?.split("T")[0].split(".")[0]}</h4>
       ),
@@ -119,33 +119,36 @@ const Tournaments = () => {
     {
       field: "status",
       headerName: t("status"),
-      flex: 0.5,
+      flex: 0.1,
     },
     {
       field: "actions",
       headerName: t("action"),
-      flex: 0.5,
+      flex: 0.2,
       renderCell: (params) => (
-        <div>
+        <Box sx={{
+          flexDirection: 'row',
+          gap: 10
+        }}>
         <Button 
           onClick={() => handleView(params.row)}
-          sx={{ color: theme.palette.background.light }}
+          sx={{ color: theme.palette.background.light, width: '25%' }}
         >
           <Visibility color={theme.palette.background.light} />
         </Button>
           <Button 
             onClick={() => handleEdit(params.row)}
-            sx={{ color: theme.palette.background.light }}
+            sx={{ color: theme.palette.background.light, width: '25%' }}
           >
             <Edit color={theme.palette.background.light} />
           </Button>
           <Button 
             onClick={() => handleDelete(params.row._id)}
-            sx={{ marginLeft: '8px', color: theme.palette.action.delete }}
+            sx={{ marginLeft: '8px', color: theme.palette.action.delete, width: '25%' }}
           >
             <Delete color={theme.palette.action.delete} />
           </Button>
-        </div>
+        </Box>
       ),
     },
   ];
@@ -274,7 +277,9 @@ const Tournaments = () => {
         mb="50px"
         sx={{
           overflowX: 'auto',
-          width: '100%',
+          justifyItems: 'center',
+          alignItems: 'center',
+          margin: 'auto',
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: theme.palette.background.alt,
             color: theme.palette.secondary[100],
@@ -290,7 +295,7 @@ const Tournaments = () => {
           },
           '@media (max-width: 600px)': {
             '& .MuiDataGrid-root': {
-              minWidth: '960px',
+              minWidth: '1260px',
             },
           },
         }}
@@ -320,7 +325,9 @@ const Tournaments = () => {
       mb="50px"
       sx={{
         overflowX: 'auto',
-        width: '100%',
+        justifyItems: 'center',
+        alignItems: 'center',
+        margin: 'auto',
         "& .MuiDataGrid-columnHeaders": {
           backgroundColor: theme.palette.background.alt,
           color: theme.palette.secondary[100],
@@ -333,6 +340,11 @@ const Tournaments = () => {
         },
         "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
           color: `${theme.palette.secondary[200]} !important`,
+        },
+        '@media (max-width: 600px)': {
+          '& .MuiDataGrid-root': {
+            minWidth: '1260px',
+          },
         },
       }}
     >
@@ -361,7 +373,9 @@ const Tournaments = () => {
       mb="50px"
       sx={{
         overflowX: 'auto',
-        width: '100%',
+        justifyItems: 'center',
+        alignItems: 'center',
+        margin: 'auto',
         "& .MuiDataGrid-columnHeaders": {
           backgroundColor: theme.palette.background.alt,
           color: theme.palette.secondary[100],
@@ -377,7 +391,7 @@ const Tournaments = () => {
         },
         '@media (max-width: 600px)': {
           '& .MuiDataGrid-root': {
-            minWidth: '960px',
+            minWidth: '1260px',
           },
         },
       }}
@@ -407,7 +421,9 @@ const Tournaments = () => {
       mb="50px"
       sx={{
         overflowX: 'auto',
-        width: '100%',
+        justifyItems: 'center',
+        alignItems: 'center',
+        margin: 'auto',
         "& .MuiDataGrid-columnHeaders": {
           backgroundColor: theme.palette.background.alt,
           color: theme.palette.secondary[100],
@@ -423,7 +439,7 @@ const Tournaments = () => {
         },
         '@media (max-width: 600px)': {
           '& .MuiDataGrid-root': {
-            minWidth: '960px',
+            minWidth: '1260px',
           },
         },
       }}
