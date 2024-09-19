@@ -1,4 +1,5 @@
 import Conversation from "../models/conversation.model.js";
+import User from "../models/user.model.js";
 import Message from "../models/message.model.js";
 import { getRecipientSocketId, io } from "../socket/socket.js";
 import { v2 as cloudinary } from "cloudinary";
@@ -58,6 +59,7 @@ async function sendMessage(req, res) {
     if (recipientSocketId) {
       io.to(recipientSocketId).emit("newMessage", newMessage);
     }
+    await User.updateOne({ _id: senderId }, { $inc: { exp: 2 } });
 
     res.status(201).json(newMessage);
   } catch (error) {

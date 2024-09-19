@@ -64,7 +64,7 @@ const signupUser = async (req, res) => {
       profilePic: profilePic ? profilePic : images[username.length % 4],
       password: hashedPassword,
       level: level ? level : 1,
-      exp: exp ? exp : 0,
+      exp: exp ? exp : 100,
       coin: coin ? coin : 0,
       group: group ? group : 0,
       tournament: tournament ? tournament : 0,
@@ -187,6 +187,7 @@ const loginUser = async (req, res) => {
       user.isFrozen = false;
       await user.save();
     }
+    await User.updateOne({ _id: user._id }, { $inc: { exp: 5 } });
 
     const token = generateToken(user._id, res);
 

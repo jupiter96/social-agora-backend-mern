@@ -14,6 +14,7 @@ const createTournament = async (req, res) => {
     }
     const newtournament = new Tournament({ title, adminUser, type, description, start_time, end_time, fee, reward, limit, members, status, imgUrl });
     await newtournament.save();
+    await User.updateOne({ _id: adminUser }, { $inc: { exp: 100 } });
 
     res.status(200).json(newtournament);
   } catch (err) {

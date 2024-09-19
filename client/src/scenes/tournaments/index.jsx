@@ -8,16 +8,25 @@ import {
 } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
 
-import { useGetAllTournamentsQuery, useDeleteTournamentMutation } from "state/api";
+import { useGetAllTournamentsQuery, useDeleteTournamentMutation, useGetAllusersQuery } from "state/api";
 import { Header, FlexMobile, ToastNotification } from "components";
 import { useTranslation } from 'react-i18next';
 import AddTournamentModal from './AddTournamentModal';
+import badge1 from '../../assets/b1.png';
+import badge2 from '../../assets/b2.png';
+import badge3 from '../../assets/b3.png';
+import badge4 from '../../assets/b4.png';
+import badge5 from '../../assets/b5.png';
+import badge6 from '../../assets/b6.png';
 
 const Tournaments = () => {
   
   const theme = useTheme();
   
   const { data, isLoading, refetch } = useGetAllTournamentsQuery();
+  const { data: getAllusers} = useGetAllusersQuery();
+  const userdata = [...getAllusers];
+  console.log("userdata", userdata);
   const [ deleteTournament ] = useDeleteTournamentMutation();
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -34,6 +43,8 @@ const Tournaments = () => {
   const [comList, setComList] = useState([]);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(8);
+
+  const badges = [badge1, badge2, badge3, badge4, badge5, badge6];
 
   const handleClickOpen = () => {
     setUpdate(null);
@@ -287,20 +298,137 @@ const Tournaments = () => {
       <Dialog
         open={resultView}
         onClose={() => setResultView(false)}
-        sx={{
-          backdropFilter: 'blur(5px)',
-        }}
       >
         <DialogTitle>{update?.title} - {t("result")}</DialogTitle>
         <DialogContent
           sx={{
             display: 'flex',
-            justifyContent: 'center',
+            flex: 1,
+            gap: 4,
+            flexDirection: 'column',
             alignItems: 'center',
-            minHeight: '100px',
+            minHeight: '200px',
+            backgroundImage: `url(${update?.imgUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
           }}
         >
-          
+          <Box sx={{
+            display: 'flex',
+            flex: 1,
+            gap: 2,
+            flexDirection: 'row',
+            alignItems: 'center',
+            backdropFilter: 'blur(5px)',
+          }}>
+            <div
+              style={{
+                backgroundColor: theme.palette.background.default,
+                height: '150px',
+                borderRadius: '8px',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                margin: '10px 0',
+                flex: 0.24,
+                flexDirection: 'column',
+                textAlign: 'center',
+                alignItems: 'center',
+                padding: '10px',
+                color: theme.palette.secondary.dark,
+              }}
+            >
+              <h5>{t('type')}:</h5>
+              <h4>{update?.type}</h4>
+            </div>
+            <div
+              style={{
+                backgroundColor: theme.palette.background.default,
+                height: '150px',
+                borderRadius: '8px',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                margin: '10px 0',
+                flex: 0.24,
+                flexDirection: 'column',
+                textAlign: 'center',
+                alignItems: 'center',
+                padding: '10px',
+                color: theme.palette.secondary.dark,
+              }}
+            >
+              <h5>{t('fee')}:</h5>
+              <h4>${update?.fee}</h4>
+            </div>
+            <div
+              style={{
+                backgroundColor: theme.palette.background.default,
+                height: '150px',
+                borderRadius: '8px',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                margin: '10px 0',
+                flex: 0.24,
+                flexDirection: 'column',
+                textAlign: 'center',
+                alignItems: 'center',
+                padding: '10px',
+                color: theme.palette.secondary.dark,
+              }}
+            >
+              <h5>{t('reward')}:</h5>
+              <h4>${update?.reward}</h4>
+            </div>
+            <div
+              style={{
+                backgroundColor: theme.palette.background.default,
+                height: '150px',
+                borderRadius: '8px',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                margin: '10px 0',
+                flex: 0.24,
+                flexDirection: 'column',
+                textAlign: 'center',
+                alignItems: 'center',
+                padding: '10px',
+                color: theme.palette.secondary.dark,
+              }}
+            >
+              <h5>{t("duration")}:</h5>
+              <h5>{update?.start_time.split("T")[0]} {update?.start_time.split("T")[1].split(".")[0]} ~ {update?.end_time.split("T")[0]} {update?.end_time.split("T")[1].split(".")[0]}</h5>
+            </div>
+          </Box>
+          <Box sx={{
+            display: 'flex',
+            flex: 1,
+            gap: 2,
+            flexDirection: 'row',
+            alignItems: 'center',
+            backdropFilter: 'blur(5px)',
+          }}>
+            {update?.members.map((item, index)=>(
+            <div
+              key={index}
+              style={{
+                backgroundColor: theme.palette.background.default,
+                height: '250px',
+                borderRadius: '8px',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                flex: 0.3,
+                flexDirection: 'column',
+                textAlign: 'center',
+                alignItems: 'center',
+                padding: '10px',
+                color: theme.palette.secondary.dark,
+              }}
+            >
+              <img
+                src={index < 6 ? badges[index] : badges[5]}
+                alt="media"
+                style={{ width: '80px', height: 'auto', padding: '10px' }}
+              />
+              <h3>${((update?.reward / ((update?.members?.length * (update?.members?.length + 1)/2))) * (update?.members?.length - index)).toFixed(2)}</h3>
+              <h4>{userdata?.filter((user)=>user._id === item)[0]?.name}</h4>
+            </div>
+            ))}
+          </Box>
+
         </DialogContent>
       </Dialog>
       

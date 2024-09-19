@@ -38,6 +38,8 @@ const createPost = async (req, res) => {
     const newPost = new Post({ postedBy, text, img, widthRatio: 1, heightRatio: 1 });
     await newPost.save();
 
+    await User.updateOne({ _id: postedBy }, { $inc: { exp: 10 } });
+
     res.status(200).json(newPost);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -146,11 +148,13 @@ const likeUnlikePost = async (req, res) => {
     if (userLikedPost) {
       // Unlike post
       await Post.updateOne({ _id: postId }, { $pull: { likes: userId } });
+      await User.updateOne({ _id: userId }, { $inc: { exp: 5 } });
       res.status(200).json({ message: "Post unliked successfully" });
     } else {
       // Like post
       post.likes.push(userId);
       await post.save();
+      await User.updateOne({ _id: userId }, { $inc: { exp: 5 } });
       res.status(200).json({ message: "Post liked successfully" });
     }
   } catch (err) {
@@ -179,6 +183,7 @@ const replyToPost = async (req, res) => {
 
     post.replies.push(reply);
     await post.save();
+    await User.updateOne({ _id: userId }, { $inc: { exp: 15 } });
 
     res.status(200).json(reply);
   } catch (err) {

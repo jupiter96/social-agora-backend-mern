@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
+import User from "../models/user.model.js";
 import Group from "../models/group.model.js";
 
 const createGroup = async (req, res) => {
@@ -12,6 +13,8 @@ const createGroup = async (req, res) => {
     }
     const newGroup = new Group({ group_name, game, imgUrl, adminUser, description, members });
     await newGroup.save();
+
+    await User.updateOne({ _id: adminUser }, { $inc: { exp: 50 } });
 
     res.status(200).json(newGroup);
   } catch (err) {
