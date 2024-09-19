@@ -32,6 +32,11 @@ const editGroup = async (req, res) => {
       return res.status(404).json({ error: "Group not found" });
     }
     if (imgUrl.includes("base64")) {
+      if (group.imgUrl) {
+        await cloudinary.uploader.destroy(
+          group.imgUrl.split("/").pop().split(".")[0]
+        );
+      }
       const uploadedResponse = await cloudinary.uploader.upload(imgUrl);
       imgUrl = uploadedResponse.secure_url;
     }

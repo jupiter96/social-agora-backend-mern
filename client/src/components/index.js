@@ -4,6 +4,7 @@
 import CustomColumnMenu from "./DataGridCustomColumnMenu";
 import DataGridCustomToolbar from "./DataGridCustomToolbar";
 import FlexBetween from "./FlexBetween";
+import FlexMobile from "./FlexMobile";
 import ToastNotification from "./ToastNotification";
 import Header from "./Header";
 import Navbar from "./Navbar";
@@ -16,6 +17,7 @@ export {
   CustomColumnMenu,
   DataGridCustomToolbar,
   FlexBetween,
+  FlexMobile,
   ToastNotification,
   Header,
   Navbar,

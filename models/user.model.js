@@ -50,6 +50,26 @@ const userSchema = mongoose.Schema(
       type: String,
       default: 'Free'
     },
+    level: {
+      type: Number,
+      default: 1
+    },
+    exp: {
+      type: Number,
+      default: 0
+    },
+    coin: {
+      type: Number,
+      default: 0
+    },
+    group: {
+      type: Number,
+      default: 0
+    },
+    tournament: {
+      type: Number,
+      default: 0
+    },
     expireDate: {
       type: [String],
     }

@@ -23,11 +23,11 @@ import {
   useGetPaymentStatisticsQuery,
   useGetTournamentStatisticsQuery,
  } from "state/api";
-import { useSelector } from "react-redux";
+import { useSelector } from "react-redux"; 
 
 // import { useGetDashboardQuery } from "state/api";
 import {
-  FlexBetween,
+  FlexMobile,
   Header,
   // BreakdownChart,
   OverviewChart,
@@ -114,12 +114,12 @@ const Dashboard = () => {
 
   return (
     <Box m="1.5rem 2.5rem">
-      <FlexBetween>
+      <FlexMobile>
         {/* Header */}
         <Header title={t("dashboard")} subtitle={`${t('welcome') }, ${currentUser.name}`} />
 
         {/* Content */}
-        <Box sx={{flexDirection: 'row', gap: 10}}>
+        <Box>
           {/* Download Reports */}
           <Button
             onClick={()=>downloadExcel(data)}
@@ -147,6 +147,7 @@ const Dashboard = () => {
               fontSize: "14px",
               fontWeight: "bold",
               padding: "10px 20px",
+              marginLeft: 2,
               borderRadius: 50,
               "&:hover": {
                 backgroundColor: theme.palette.background.alt,
@@ -158,7 +159,7 @@ const Dashboard = () => {
             {t("PDF")}
           </Button>
         </Box>
-      </FlexBetween>
+      </FlexMobile>
 
       <Box
         mt="20px"

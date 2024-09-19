@@ -1,9 +1,9 @@
-import React from "react";
+import React, {useState} from "react";
 import { Box, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 
 import { useGetAllPaymentsQuery } from "state/api";
-import { Header, FlexBetween } from "components";
+import { Header, FlexMobile } from "components";
 import { useTranslation } from 'react-i18next';
 
 const Payments = () => {
@@ -12,6 +12,8 @@ const Payments = () => {
   
   const { data, isLoading } = useGetAllPaymentsQuery();
   const { t } = useTranslation();
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(8);
 
   const columns = [
     {
@@ -33,7 +35,8 @@ const Payments = () => {
       field: "plan",
       headerName: t("plan"),
       flex: 0.5,
-    },{
+    },
+    {
       field: 'status',
       headerName: 'Status',
       flex: 0.3,
@@ -65,11 +68,11 @@ const Payments = () => {
   ];
   return (
     <Box m="1.5rem 0.5rem">
-      <FlexBetween m="0.5rem 1.5rem">
+      <FlexMobile m="0.5rem 1.5rem">
         <Header title={`${t("payment")}s`} subtitle={t("allPayment")} />
         <Box>
         </Box>
-      </FlexBetween>
+      </FlexMobile>
       
       <Box
         mt="40px"
@@ -101,9 +104,13 @@ const Payments = () => {
         <DataGrid
           loading={isLoading || !data}
           getRowId={(row) => row._id}
-          rows={data ? data : []}
+          rows={data ? [...data].reverse() : []}
           columns={columns}
-          pageSize={8}
+          onPageChange={(newPage) => setPage(newPage)}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          pagination
+          page={page}
+          pageSize={pageSize}
           rowsPerPageOptions={[8, 16, 32, 64]}
           localeText={{
             footerTotalVisibleRows: (visibleCount, totalCount) => 

@@ -8,7 +8,7 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 
 import { useGetAllFeedsQuery, useDeleteFeedMutation } from "state/api";
-import { Header, FlexBetween, ToastNotification } from "components";
+import { Header, FlexMobile, ToastNotification, DataGridCustomToolbar } from "components";
 import { useTranslation } from 'react-i18next';
 import AddFeedModal from './AddFeedModal';
 
@@ -26,10 +26,30 @@ const Feeds = () => {
   const [severity, setSeverity] = useState('success');
   const [message, setMessage] = useState('');
   const [update, setUpdate] = useState([]);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(8);
+  const [sort, setSort] = useState({});
+  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [filteredData, setFilteredData] = useState(data);
+  console.log(sort, search);
+
+  useEffect(() => {
+    if (searchInput) {
+      const filtered = data.filter((row) =>
+        Object.values(row).some((value) =>
+          String(value).toLowerCase().includes(searchInput.toLowerCase())
+        )
+      );
+      setFilteredData(filtered);
+    } else {
+      setFilteredData(data);
+    }
+  }, [searchInput, data]);
 
   const handleClickOpen = () => {
-    setOpen(true);
     setUpdate([]);
+    setOpen(true);
   };
 
   const handleClose = () => {
@@ -165,7 +185,7 @@ const Feeds = () => {
 
   return (
     <Box m="1.5rem 0.5rem">
-      <FlexBetween m="0.5rem 1.5rem">
+      <FlexMobile m="0.5rem 1.5rem">
         <Header title={t("allfeeds")} subtitle={t("feeds")} />
         <Box>
           
@@ -189,7 +209,7 @@ const Feeds = () => {
             {t('add')}
           </Button>
         </Box>
-      </FlexBetween>
+      </FlexMobile>
 
       <AddFeedModal 
       open={open} 
@@ -248,12 +268,16 @@ const Feeds = () => {
       >
         
         <DataGrid
-          loading={isLoading || !data}
+          loading={isLoading || !filteredData}
           getRowId={(row) => row._id}
-          rows={data ? data : []}
+          rows={filteredData ? [...filteredData].reverse() : []}
           columns={columns}
-          pageSize={8}
           rowsPerPageOptions={[8, 16, 32, 64]}
+          onPageChange={(newPage) => setPage(newPage)}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          pagination
+          page={page}
+          pageSize={pageSize}
           localeText={{
             footerTotalVisibleRows: (visibleCount, totalCount) => 
               `${visibleCount} de ${totalCount}`,
@@ -261,7 +285,12 @@ const Feeds = () => {
               `${count} fila(s) seleccionada(s)`,
           }}
           autoHeight 
-          disableSelectionOnClick 
+          disableSelectionOnClick
+          onSortModelChange={(newSortModel) => setSort(...newSortModel)}
+          components={{ Toolbar: DataGridCustomToolbar }}
+          componentsProps={{
+            toolbar: { searchInput, setSearchInput, setSearch },
+          }}
         />
       </Box>
       <ToastNotification open={showToast} message={message} severity={severity} hideToast={hideToast} />

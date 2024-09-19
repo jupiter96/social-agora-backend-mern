@@ -8,7 +8,7 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 
 import { useGetAllGroupsQuery, useDeleteGroupMutation } from "state/api";
-import { Header, FlexBetween, ToastNotification } from "components";
+import { Header, FlexMobile, ToastNotification } from "components";
 import { useTranslation } from 'react-i18next';
 import AddGroupModal from './AddGroupModal';
 
@@ -26,10 +26,12 @@ const Groups = () => {
   const [severity, setSeverity] = useState('success');
   const [message, setMessage] = useState('');
   const [update, setUpdate] = useState([]);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(8);
 
   const handleClickOpen = () => {
-    setOpen(true);
     setUpdate([]);
+    setOpen(true);
   };
 
   const handleClose = () => {
@@ -156,7 +158,7 @@ const Groups = () => {
 
   return (
     <Box m="1.5rem 0.5rem">
-      <FlexBetween m="0.5rem 1.5rem">
+      <FlexMobile m="0.5rem 1.5rem">
         <Header title={`${t("group")}s`} subtitle={t("allGroups")} />
         <Box>
           
@@ -180,7 +182,7 @@ const Groups = () => {
             {t('add')}
           </Button>
         </Box>
-      </FlexBetween>
+      </FlexMobile>
 
       <AddGroupModal 
       open={open} 
@@ -243,9 +245,13 @@ const Groups = () => {
         <DataGrid
           loading={isLoading || !data}
           getRowId={(row) => row._id}
-          rows={data ? data : []}
+          rows={data ? [...data].reverse() : []}
           columns={columns}
-          pageSize={8}
+          onPageChange={(newPage) => setPage(newPage)}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          pagination
+          page={page}
+          pageSize={pageSize}
           rowsPerPageOptions={[8, 16, 32, 64]}
           localeText={{
             footerTotalVisibleRows: (visibleCount, totalCount) => 

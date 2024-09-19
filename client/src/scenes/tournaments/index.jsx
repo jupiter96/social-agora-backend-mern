@@ -3,13 +3,13 @@ import { Box, useTheme, Button, CircularProgress, Dialog, DialogTitle, DialogCon
 import {
   AddCircle,
   Edit,
-  // Visibility,
+  EmojiEvents,
   Delete
 } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
 
 import { useGetAllTournamentsQuery, useDeleteTournamentMutation } from "state/api";
-import { Header, FlexBetween, ToastNotification } from "components";
+import { Header, FlexMobile, ToastNotification } from "components";
 import { useTranslation } from 'react-i18next';
 import AddTournamentModal from './AddTournamentModal';
 
@@ -24,20 +24,26 @@ const Tournaments = () => {
   const [status, setStatus] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [resultView, setResultView] = useState(false);
   const [severity, setSeverity] = useState('success');
   const [message, setMessage] = useState('');
-  const [update, setUpdate] = useState([]);
+  const [update, setUpdate] = useState(null);
   const [currentTab, setCurrentTab] = useState(0);
+  const [liveList, setLiveList] = useState([]);
+  const [upList, setUpList] = useState([]);
+  const [comList, setComList] = useState([]);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(8);
 
   const handleClickOpen = () => {
+    setUpdate(null);
     setOpen(true);
-    setUpdate([]);
   };
 
-  // const handleView = () => {
-  //   setOpen(true);
-  //   setUpdate([]);
-  // };
+  const handleView = (row) => {
+    setUpdate(row);
+    setResultView(true);
+  };
 
   const handleClose = () => {
     setStatus(true);
@@ -86,7 +92,7 @@ const Tournaments = () => {
     {
       field: "type",
       headerName: t("type"),
-      flex: 0.1,
+      flex: 0.05,
     },
     {
       field: "fee",
@@ -119,7 +125,31 @@ const Tournaments = () => {
     {
       field: "status",
       headerName: t("status"),
-      flex: 0.1,
+      flex: 0.15,
+      renderCell: (params) => {
+        let badgeStyle = {
+          borderRadius: '12px',
+          padding: '5px 10px',
+          color: 'white',
+          display: 'inline-block',
+          width: '90%',
+          textAlign: 'center'
+        };
+  
+        if (params.value === 'Live') {
+          badgeStyle.backgroundColor = '#04af21';
+        } else if (params.value === 'Upcoming') {
+          badgeStyle.backgroundColor = '#999922';
+        } else {
+          badgeStyle.backgroundColor = 'gray'; // Default color for other statuses
+        }
+  
+        return (
+          <div style={badgeStyle}>
+            {params.value}
+          </div>
+        );
+      }
     },
     {
       field: "actions",
@@ -130,21 +160,22 @@ const Tournaments = () => {
           flexDirection: 'row',
           gap: 10
         }}>
-        {/* <Button 
+        {params.row.status === 'Completed' ? (<Button 
           onClick={() => handleView(params.row)}
-          sx={{ color: theme.palette.background.light, width: '25%' }}
+          sx={{ color: theme.palette.secondary.light, width: '25%' }}
         >
-          <Visibility color={theme.palette.background.light} />
-        </Button> */}
+          <EmojiEvents color={theme.palette.secondary.light} />
+        </Button>):(
           <Button 
             onClick={() => handleEdit(params.row)}
-            sx={{ color: theme.palette.background.light, width: '45%' }}
+            sx={{ color: theme.palette.secondary.light, width: '25%' }}
           >
-            <Edit color={theme.palette.background.light} />
+            <Edit color={theme.palette.secondary.light} />
           </Button>
+        )}
           <Button 
             onClick={() => handleDelete(params.row._id)}
-            sx={{ marginLeft: '8px', color: theme.palette.action.delete, width: '45%' }}
+            sx={{ marginLeft: '8px', color: theme.palette.action.delete, width: '25%' }}
           >
             <Delete color={theme.palette.action.delete} />
           </Button>
@@ -191,11 +222,14 @@ const Tournaments = () => {
       refetch();
       setStatus(false);
     }
-  }, [status, refetch]);
+    setLiveList(data?.filter((res) => res.status === 'Live'));
+    setUpList(data?.filter((res) => res.status === 'Upcoming'));
+    setComList(data?.filter((res) => res.status === 'Completed'));
+  }, [status, refetch, data]);
 
   return (
     <Box m="1.5rem 0.5rem">
-      <FlexBetween m="0.5rem 1.5rem">
+      <FlexMobile m="0.5rem 1.5rem">
         <Header title={`${t("tournament")}s`}/>
         <Box>
           
@@ -219,7 +253,7 @@ const Tournaments = () => {
             {t('add')}
           </Button>
         </Box>
-      </FlexBetween>
+      </FlexMobile>
 
       <AddTournamentModal 
       open={open} 
@@ -231,24 +265,44 @@ const Tournaments = () => {
       showToastHandle={setShowToast} />
       
       <Dialog
-      open={processing}
-      onClose={() => setProcessing(false)}
-      sx={{
-        backdropFilter: 'blur(5px)',
-      }}
-    >
-      <DialogTitle>{t("processing")}</DialogTitle>
-      <DialogContent
+        open={processing}
+        onClose={() => setProcessing(false)}
         sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '100px',
+          backdropFilter: 'blur(5px)',
         }}
       >
-        <CircularProgress />
-      </DialogContent>
-    </Dialog>
+        <DialogTitle>{t("processing")}</DialogTitle>
+        <DialogContent
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '100px',
+          }}
+        >
+          <CircularProgress />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={resultView}
+        onClose={() => setResultView(false)}
+        sx={{
+          backdropFilter: 'blur(5px)',
+        }}
+      >
+        <DialogTitle>{update?.title} - {t("result")}</DialogTitle>
+        <DialogContent
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '100px',
+          }}
+        >
+          
+        </DialogContent>
+      </Dialog>
       
     <Tabs value={currentTab}
      onChange={handleTabChange}
@@ -265,10 +319,10 @@ const Tournaments = () => {
         color: theme.palette.background.alt,
       },
     }}>
-      <Tab label={t('allTournaments')} />
-      <Tab label={t('liveTournaments')} />
-      <Tab label={t('upTournaments')} />
-      <Tab label={t('comTournaments')} />
+      <Tab label={t('all')} />
+      <Tab label={t('live')} />
+      <Tab label={t('upcoming')} />
+      <Tab label={t('completed')} />
     </Tabs>
 
     {currentTab === 0 && (
@@ -304,9 +358,13 @@ const Tournaments = () => {
         <DataGrid
           loading={isLoading || !data}
           getRowId={(row) => row._id}
-          rows={data ? data : []}
+          rows={data ? [...data].reverse() : []}
           columns={columns}
-          pageSize={8}
+          onPageChange={(newPage) => setPage(newPage)}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          pagination
+          page={page}
+          pageSize={pageSize}
           rowsPerPageOptions={[8, 16, 32, 64]}
           localeText={{
             footerTotalVisibleRows: (visibleCount, totalCount) => 
@@ -350,11 +408,15 @@ const Tournaments = () => {
     >
       
       <DataGrid
-        loading={isLoading || !data}
+        loading={isLoading || !liveList}
         getRowId={(row) => row._id}
-        rows={data ? data : []}
+        rows={liveList ? liveList : []}
         columns={columns}
-        pageSize={8}
+        onPageChange={(newPage) => setPage(newPage)}
+        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+        pagination
+        page={page}
+        pageSize={pageSize}
         rowsPerPageOptions={[8, 16, 32, 64]}
         localeText={{
           footerTotalVisibleRows: (visibleCount, totalCount) => 
@@ -398,11 +460,15 @@ const Tournaments = () => {
     >
       
       <DataGrid
-        loading={isLoading || !data}
+        loading={isLoading || !upList}
         getRowId={(row) => row._id}
-        rows={data ? data : []}
+        rows={upList ? upList : []}
         columns={columns}
-        pageSize={8}
+        onPageChange={(newPage) => setPage(newPage)}
+        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+        pagination
+        page={page}
+        pageSize={pageSize}
         rowsPerPageOptions={[8, 16, 32, 64]}
         localeText={{
           footerTotalVisibleRows: (visibleCount, totalCount) => 
@@ -446,11 +512,15 @@ const Tournaments = () => {
     >
       
       <DataGrid
-        loading={isLoading || !data}
+        loading={isLoading || !comList}
         getRowId={(row) => row._id}
-        rows={data ? data : []}
+        rows={comList ? comList : []}
         columns={columns}
-        pageSize={8}
+        onPageChange={(newPage) => setPage(newPage)}
+        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+        pagination
+        page={page}
+        pageSize={pageSize}
         rowsPerPageOptions={[8, 16, 32, 64]}
         localeText={{
           footerTotalVisibleRows: (visibleCount, totalCount) => 

@@ -8,7 +8,7 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 
 import { useGetAllFeedsQuery, useDeleteFeedMutation } from "state/api";
-import { Header, FlexBetween, ToastNotification } from "components";
+import { Header, FlexMobile, ToastNotification } from "components";
 import { useTranslation } from 'react-i18next';
 import AddChatModal from './AddChatModal';
 
@@ -28,8 +28,8 @@ const Chats = () => {
   const [update, setUpdate] = useState([]);
 
   const handleClickOpen = () => {
-    setOpen(true);
     setUpdate([]);
+    setOpen(true);
   };
 
   const handleClose = () => {
@@ -165,7 +165,7 @@ const Chats = () => {
 
   return (
     <Box m="1.5rem 0.5rem">
-      <FlexBetween m="0.5rem 1.5rem">
+      <FlexMobile m="0.5rem 1.5rem">
         <Header title={`${t("chat")}s`} subtitle={t("allChat")} />
         <Box>
           
@@ -189,7 +189,7 @@ const Chats = () => {
             {t('sendMessage')}
           </Button>
         </Box>
-      </FlexBetween>
+      </FlexMobile>
 
       <AddChatModal 
       open={open} 

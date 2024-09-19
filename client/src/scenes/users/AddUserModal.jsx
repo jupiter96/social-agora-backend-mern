@@ -35,6 +35,11 @@ const AddUserModal = ({ open, onClose, update, processHandle, severityHandle, me
     role: update?.role ? update.role:'User',
     member: update?.member ? update.member:'Free',
     expireDate: update?.expireDate ? dayjs(update.expireDate):null,
+    level: update?.level ? update.level:1,
+    coin: update?.coin ? update.coin:0,
+    exp: update?.exp ? update.exp:0,
+    group: update?.group ? update.group:0,
+    tournament: update?.tournament ? update.tournament:0,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
@@ -144,6 +149,11 @@ const AddUserModal = ({ open, onClose, update, processHandle, severityHandle, me
         role: update?.role ? update.role:'User',
         member: update?.member ? update.member:'Free',
         expireDate: update?.expireDate ? dayjs(update.expireDate):null,
+        level: update?.level ? update.level:1,
+        coin: update?.coin ? update.coin:0,
+        exp: update?.exp ? update.exp:0,
+        group: update?.group ? update.group:0,
+        tournament: update?.tournament ? update.tournament:0,
       });
       setImagePreview(update?.profilePic ? update.profilePic:null);
     }
@@ -238,6 +248,56 @@ const AddUserModal = ({ open, onClose, update, processHandle, severityHandle, me
               fullWidth
               margin="normal"
               value={formData.bio}
+              onChange={handleChange}
+            />
+            
+            <TextField
+              label={t("level")}
+              name="level"
+              fullWidth
+              type='number'
+              margin="normal"
+              value={formData.level}
+              onChange={handleChange}
+            />
+            
+            <TextField
+              label={t("exp")}
+              name="exp"
+              fullWidth
+              type='number'
+              margin="normal"
+              value={formData.exp}
+              onChange={handleChange}
+            />
+            
+            <TextField
+              label={t("coin")}
+              name="coin"
+              fullWidth
+              type='number'
+              margin="normal"
+              value={formData.coin}
+              onChange={handleChange}
+            />
+            
+            <TextField
+              label={t("group")}
+              name="group"
+              fullWidth
+              type='number'
+              margin="normal"
+              value={formData.group}
+              onChange={handleChange}
+            />
+            
+            <TextField
+              label={t("tournament")}
+              name="tournament"
+              fullWidth
+              type='number'
+              margin="normal"
+              value={formData.tournament}
               onChange={handleChange}
             />
             <FormControl fullWidth margin="normal">

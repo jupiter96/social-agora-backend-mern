@@ -8,8 +8,8 @@ import {
 } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
 
-// import { useGetAllBannersQuery, useDeleteBannerMutation } from "state/api";
-import { Header, FlexBetween, ToastNotification } from "components";
+import { useGetAllBannersQuery, useDeleteBannerMutation } from "state/api";
+import { Header, FlexMobile, ToastNotification } from "components";
 import { useTranslation } from 'react-i18next';
 import AddBannerModal from './AddBannerModal';
 
@@ -17,8 +17,8 @@ const Settings = () => {
   
   const theme = useTheme();
   
-  // const { data, isLoading, refetch } = useGetAllBannersQuery();
-  // const [ deleteBanner ] = useDeleteBannerMutation();
+  const { data, isLoading, refetch } = useGetAllBannersQuery();
+  const [ deleteBanner ] = useDeleteBannerMutation();
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState(false);
@@ -28,10 +28,12 @@ const Settings = () => {
   const [message, setMessage] = useState('');
   const [update, setUpdate] = useState([]);
   const [currentTab, setCurrentTab] = useState(0);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(8);
 
   const handleClickOpen = () => {
-    setOpen(true);
     setUpdate([]);
+    setOpen(true);
   };
 
   // const handleView = () => {
@@ -55,106 +57,106 @@ const Settings = () => {
     setShowToast(false);
   };
 
-  // const columns = [
-  //   {
-  //     field: "_id",
-  //     headerName: "ID",
-  //     flex: 0.3,
-  //   },
-  //   {
-  //     field: "title",
-  //     headerName: t("title"),
-  //     flex: 0.2,
-  //   },
-  //   {
-  //     field: 'imgUrl',
-  //     headerName: t("media"),
-  //     flex: 0.2,
-  //     renderCell: (params) => (
-  //       <img
-  //         src={params.value}
-  //         alt="media"
-  //         style={{ width: '80px', height: 'auto', padding: '10px' }}
-  //       />
-  //     ),
-  //   },
-  //   {
-  //     field: "actions",
-  //     headerName: t("action"),
-  //     flex: 0.3,
-  //     renderCell: (params) => (
-  //       <Box sx={{
-  //         flexDirection: 'row',
-  //         gap: 10
-  //       }}>
-  //       {/* <Button 
-  //         onClick={() => handleView(params.row)}
-  //         sx={{ color: theme.palette.background.light, width: '25%' }}
-  //       >
-  //         <Visibility color={theme.palette.background.light} />
-  //       </Button> */}
-  //         <Button 
-  //           onClick={() => handleEdit(params.row)}
-  //           sx={{ color: theme.palette.background.light, width: '45%' }}
-  //         >
-  //           <Edit color={theme.palette.background.light} />
-  //         </Button>
-  //         <Button 
-  //           onClick={() => handleDelete(params.row._id)}
-  //           sx={{ marginLeft: '8px', color: theme.palette.action.delete, width: '45%' }}
-  //         >
-  //           <Delete color={theme.palette.action.delete} />
-  //         </Button>
-  //       </Box>
-  //     ),
-  //   },
-  // ];
+  const columns = [
+    {
+      field: "_id",
+      headerName: "ID",
+      flex: 0.2,
+    },
+    {
+      field: "title",
+      headerName: t("title"),
+      flex: 0.2,
+    },
+    {
+      field: 'imgUrl',
+      headerName: t("media"),
+      flex: 0.3,
+      renderCell: (params) => (
+        <img
+          src={params.value}
+          alt="media"
+          style={{ width: '180px', height: 'auto', padding: '4px' }}
+        />
+      ),
+    },
+    {
+      field: "actions",
+      headerName: t("action"),
+      flex: 0.3,
+      renderCell: (params) => (
+        <Box sx={{
+          flexDirection: 'row',
+          gap: 10
+        }}>
+        {/* <Button 
+          onClick={() => handleView(params.row)}
+          sx={{ color: theme.palette.secondary.light, width: '25%' }}
+        >
+          <Visibility color={theme.palette.secondary.light} />
+        </Button> */}
+          <Button 
+            onClick={() => handleEdit(params.row)}
+            sx={{ color: theme.palette.secondary.light, width: '45%' }}
+          >
+            <Edit color={theme.palette.secondary.light} />
+          </Button>
+          <Button 
+            onClick={() => handleDelete(params.row._id)}
+            sx={{ marginLeft: '8px', color: theme.palette.action.delete, width: '45%' }}
+          >
+            <Delete color={theme.palette.action.delete} />
+          </Button>
+        </Box>
+      ),
+    },
+  ];
 
   const handleEdit = (row) => {
     setUpdate(row);
     setOpen(true);
   };
 
-  // const handleDelete = async(id) => {
-  //     const userConfirmed = window.confirm(t("sure"));
+  const handleDelete = async(id) => {
+      const userConfirmed = window.confirm(t("sure"));
 
-  //     if (userConfirmed) {
-  //       setProcessing(true);
-  //       try {
-  //         const response = await deleteBanner(id).unwrap();
-  //         if(response.error){
-  //           alert(response.error);
-  //         }else{
-  //           console.log("response", response);
-  //           setMessage(t('success'));
-  //           setSeverity('success');
-  //           setShowToast(true);
-  //           refetch();
-  //           setProcessing(false);
-  //         }
-  //       } catch (error) {
-  //         console.log("error", error);
-  //         setProcessing(false);
-  //         setMessage(t('failed'));
-  //         setSeverity('error');
-  //         setShowToast(true);
-  //       }
-  //     }
-  // };
+      if (userConfirmed) {
+        setProcessing(true);
+        try {
+          const response = await deleteBanner(id).unwrap();
+          if(response.error){
+            alert(response.error);
+          }else{
+            console.log("response", response);
+            setMessage(t('success'));
+            setSeverity('success');
+            setShowToast(true);
+            refetch();
+            setProcessing(false);
+          }
+        } catch (error) {
+          console.log("error", error);
+          setProcessing(false);
+          setMessage(t('failed'));
+          setSeverity('error');
+          setShowToast(true);
+        }
+      }
+  };
 
 
-  // useEffect(() => {
-  //   if (status) {
-  //     refetch();
-  //     setStatus(false);
-  //   }
-  // }, [status, refetch]);
+  useEffect(() => {
+    if (status) {
+      refetch();
+      setStatus(false);
+    }
+  }, [status, refetch]);
 
   return (
     <Box m="1.5rem 0.5rem">
-      <FlexBetween m="0.5rem 1.5rem">
+      <FlexMobile m="0.5rem 1.5rem">
         <Header title={`${t("setting")}s`}/>
-      </FlexBetween>
+      </FlexMobile>
 
       <AddBannerModal 
       open={open} 
@@ -185,25 +187,31 @@ const Settings = () => {
       </DialogContent>
     </Dialog>
       
-    <Tabs value={currentTab}
-     onChange={handleTabChange}
-     sx={{
-      '& .MuiTab-root': {
-        fontSize: '16px',
-        color: theme.palette.secondary.light,
-        backgroundColor: 'transparent',
-        borderTopLeftRadius: '15px',
-        borderTopRightRadius: '15px'
-      },
-      '& .Mui-selected': {
-        backgroundColor: theme.palette.secondary.light,
-        color: theme.palette.background.alt,
-      },
-    }}>
+    <Tabs
+      value={currentTab}
+      onChange={handleTabChange}
+      sx={{
+        overflowX: 'auto',
+        display: 'flex',
+        flexWrap: 'nowrap', // Prevent wrapping of tabs
+        '& .MuiTab-root': {
+          fontSize: { xs: '14px', sm: '16px' }, // Responsive font size
+          color: theme.palette.secondary.light,
+          backgroundColor: 'transparent',
+          borderTopLeftRadius: '15px',
+          borderTopRightRadius: '15px',
+          minWidth: '120px', // Ensure minimum width for touch targets
+          padding: '10px', // Adjust padding for better touch area
+        },
+        '& .Mui-selected': {
+          backgroundColor: theme.palette.secondary.light,
+          color: theme.palette.background.alt,
+        },
+      }}
+    >
       <Tab label={t('bannerImage')} />
       <Tab label={t('setting1')} />
       <Tab label={t('setting2')} />
-      <Tab label={t('setting3')} />
     </Tabs>
 
     {currentTab === 0 && (
@@ -236,7 +244,7 @@ const Settings = () => {
         }}
       >
         
-      <FlexBetween m="0.5rem 1.5rem">
+      <FlexMobile m="0.5rem 1.5rem">
         <Header subtitle={`${t("bannerImage")}s`}/>
         <Box>
           
@@ -260,14 +268,18 @@ const Settings = () => {
             {t('add')}
           </Button>
         </Box>
-      </FlexBetween>
+      </FlexMobile>
         
-        {/* <DataGrid
+        <DataGrid
           loading={isLoading || !data}
           getRowId={(row) => row._id}
-          rows={data ? data : []}
+          rows={data ? [...data].reverse() : []}
           columns={columns}
-          pageSize={8}
+          onPageChange={(newPage) => setPage(newPage)}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          pagination
+          page={page}
+          pageSize={pageSize}
           rowsPerPageOptions={[8, 16, 32, 64]}
           localeText={{
             footerTotalVisibleRows: (visibleCount, totalCount) => 
@@ -277,7 +289,8 @@ const Settings = () => {
           }}
           autoHeight 
           disableSelectionOnClick 
-        /> */}
+          rowHeight={150}
+        />
       </Box>
     )}
     {currentTab === 1 && (
@@ -313,37 +326,6 @@ const Settings = () => {
     </Box>
     )}
     {currentTab === 2 && (
-      <Box
-      mt="40px"
-      mb="50px"
-      sx={{
-        overflowX: 'auto',
-        justifyItems: 'center',
-        alignItems: 'center',
-        margin: 'auto',
-        "& .MuiDataGrid-columnHeaders": {
-          backgroundColor: theme.palette.background.alt,
-          color: theme.palette.secondary[100],
-          borderBottom: "none",
-        },
-        "& .MuiDataGrid-footerContainer": {
-          backgroundColor: theme.palette.background.alt,
-          color: theme.palette.secondary[100],
-          borderTop: "none",
-        },
-        "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-          color: `${theme.palette.secondary[200]} !important`,
-        },
-        '@media (max-width: 600px)': {
-          '& .MuiDataGrid-root': {
-            minWidth: '1260px',
-          },
-        },
-      }}
-    >
-    </Box>
-    )}
-    {currentTab === 3 && (
       <Box
       mt="40px"
       mb="50px"

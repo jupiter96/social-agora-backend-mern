@@ -46,6 +46,7 @@ import gameRoutes from "./routes/game.routes.js";
 import tournamentRoutes from "./routes/tournament.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
+import settingRoutes from "./routes/setting.routes.js";
 
 app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
@@ -55,6 +56,7 @@ app.use("/games", gameRoutes);
 app.use("/tournaments", tournamentRoutes);
 app.use("/payments", paymentRoutes);
 app.use("/notifications", notificationRoutes);
+app.use("/settings", settingRoutes);
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client/build', 'index.html'));

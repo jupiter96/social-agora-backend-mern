@@ -8,7 +8,7 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 
 import { useGetAllGamesQuery, useDeleteGameMutation } from "state/api";
-import { Header, FlexBetween, ToastNotification } from "components";
+import { Header, FlexMobile, ToastNotification } from "components";
 import { useTranslation } from 'react-i18next';
 import AddGameModal from './AddGameModal';
 
@@ -26,10 +26,12 @@ const Games = () => {
   const [severity, setSeverity] = useState('success');
   const [message, setMessage] = useState('');
   const [update, setUpdate] = useState([]);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(8);
 
   const handleClickOpen = () => {
-    setOpen(true);
     setUpdate([]);
+    setOpen(true);
   };
 
   const handleClose = () => {
@@ -143,7 +145,7 @@ const Games = () => {
 
   return (
     <Box m="1.5rem 0.5rem">
-      <FlexBetween m="0.5rem 1.5rem">
+      <FlexMobile m="0.5rem 1.5rem">
         <Header title={`${t("game")}s`} subtitle={t("allGames")} />
         <Box>
           
@@ -167,7 +169,7 @@ const Games = () => {
             {t('add')}
           </Button>
         </Box>
-      </FlexBetween>
+      </FlexMobile>
 
       <AddGameModal 
       open={open} 
@@ -228,10 +230,14 @@ const Games = () => {
         <DataGrid
           loading={isLoading || !data}
           getRowId={(row) => row._id}
-          rows={data ? data : []}
+          rows={data ? [...data].reverse() : []}
           columns={columns}
-          pageSize={8}
           rowsPerPageOptions={[8, 16, 32, 64]}
+          onPageChange={(newPage) => setPage(newPage)}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          pagination
+          page={page}
+          pageSize={pageSize}
           localeText={{
             footerTotalVisibleRows: (visibleCount, totalCount) => 
               `${visibleCount} de ${totalCount}`,

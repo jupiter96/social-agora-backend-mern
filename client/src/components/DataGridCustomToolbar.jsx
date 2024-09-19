@@ -9,22 +9,25 @@ import {
 } from "@mui/x-data-grid";
 
 import FlexBetween from "./FlexBetween";
+import { useTranslation } from 'react-i18next';
+
 
 // Data Grid toolbar
 const DataGridCustomToolbar = ({ searchInput, setSearchInput, setSearch }) => {
+  const { t } = useTranslation();
   return (
     <GridToolbarContainer>
       <FlexBetween width="100%">
         {/* Left Side */}
         <FlexBetween>
-          <GridToolbarColumnsButton />
-          <GridToolbarDensitySelector />
+          <GridToolbarColumnsButton title={t("columns")} />
+          <GridToolbarDensitySelector title={t("density")} />
           <GridToolbarExport />
         </FlexBetween>
 
         {/* Right Side (search) */}
         <TextField
-          label="Search..."
+          label={t("search")}
           sx={{ mb: "0.5rem", width: "15rem" }}
           onChange={(e) => setSearchInput(e.target.value)}
           value={searchInput}

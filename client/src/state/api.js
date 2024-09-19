@@ -14,10 +14,12 @@ export const api = createApi({
     "Users",
     "Games",
     "Groups",
+    "Chats",
     "Payments",
     "Messages",
     "Notifications",
     "Tournaments",
+    "Banners",
   ],
   // endpoints
   endpoints: (build) => ({
@@ -324,6 +326,49 @@ export const api = createApi({
       }),
       providesTags: ['Tournaments'],
     }),
+
+    //***************    tournaments   **********************
+    getAllBanners: build.query({
+      query: () => ({
+        url: "settings/banners/getbanners",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        }
+      }),
+      providesTags: ["Banners"],
+    }),
+    createBanner: build.mutation({
+      query: (banner) => ({
+        url: 'settings/banners/create',
+        method: 'POST',
+        body: banner,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      providesTags: ['Banners'],
+    }),
+    editBanner: build.mutation({
+      query: (banner) => ({
+        url: `settings/banners/editbanner/${banner.id}`,
+        method: 'PUT',
+        body: banner,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      providesTags: ['Banners'],
+    }),
+    deleteBanner: build.mutation({
+      query: (id) => ({
+        url: `settings/banners/${id}`,
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      providesTags: ['Banners'],
+    }),
   }),
 });
 
@@ -370,5 +415,10 @@ export const {
   useCreateTournamentMutation,
   useEditTournamentMutation,
   useDeleteTournamentMutation,
+
+  useGetAllBannersQuery,
+  useCreateBannerMutation,
+  useEditBannerMutation,
+  useDeleteBannerMutation,
 
 } = api;

@@ -6,7 +6,11 @@ const Header = ({ title, subtitle }) => {
   // theme
   const theme = useTheme();
   return (
-    <Box>
+    <Box sx={{
+      '@media (max-width: 600px)': {
+        textAlign: "center", // Align items to the start for better spacing
+      },
+    }}>
       {/* Title */}
       <Typography
         variant="h2"

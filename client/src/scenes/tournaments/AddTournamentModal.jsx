@@ -172,30 +172,34 @@ const AddTournamentModal = ({ open, onClose, update, processHandle, severityHand
               />
             </Box>
           )}
-            <Box display="flex" alignItems="center" justifyContent={"center"} marginTop={2}>
-              <input
-                accept="image/*"
-                style={{ display: 'none' }}
-                id="profile-pic-upload"
-                type="file"
-                onChange={handleFileChange}
-              />
-              <label htmlFor="profile-pic-upload">
-                <IconButton color="second" component="a"
-                sx={{
-                  fontSize: "34px",
-                  fontWeight: "bold",
-                  borderRadius: 50,
-                  backgroundColor: theme.palette.secondary.main,
-        
-                  "&:hover": {
-                    backgroundColor: theme.palette.background.alt,
-                    color: theme.palette.secondary.light,
-                  }}}>
-                  <Image fontSize='40px' />
-                </IconButton>
-              </label>
-            </Box>
+            {((update && update.status === 'Upcoming') || update === null) && (
+              <Box display="flex" alignItems="center" justifyContent={"center"} marginTop={2}>
+                <input
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  id="profile-pic-upload"
+                  type="file"
+                  onChange={handleFileChange}
+                />
+                <label htmlFor="profile-pic-upload">                
+                  <IconButton 
+                  color="second" 
+                  component="a"
+                  sx={{
+                    fontSize: "34px",
+                    fontWeight: "bold",
+                    borderRadius: 50,
+                    backgroundColor: theme.palette.secondary.main,
+          
+                    "&:hover": {
+                      backgroundColor: theme.palette.background.alt,
+                      color: theme.palette.secondary.light,
+                    }}}>
+                    <Image fontSize='40px' />
+                  </IconButton>
+                </label>
+              </Box>
+            )}
             <TextField
               label={t("title")}
               name="title"
@@ -203,6 +207,7 @@ const AddTournamentModal = ({ open, onClose, update, processHandle, severityHand
               margin="normal"
               value={formData.title}
               onChange={handleChange}
+              disabled={!((update && update.status === 'Upcoming') || update === null)}
             />
             {update?._id ? (<TextField
               label={t("admin")}
@@ -246,6 +251,7 @@ const AddTournamentModal = ({ open, onClose, update, processHandle, severityHand
               onChange={handleChange}
               multiline
               rows={4}
+              disabled={!((update && update.status === 'Upcoming') || update === null)}
             />
             <FormControl fullWidth margin="normal">
               <InputLabel>{t("type")}</InputLabel>
@@ -253,6 +259,7 @@ const AddTournamentModal = ({ open, onClose, update, processHandle, severityHand
                 name='type'
                 value={formData.type}
                 onChange={handleChange}
+                disabled={!((update && update.status === 'Upcoming') || update === null)}
               >
                 <MenuItem value="Individual">{t("individual")}</MenuItem>
                 <MenuItem value="team">{t("team")}</MenuItem>
@@ -266,6 +273,7 @@ const AddTournamentModal = ({ open, onClose, update, processHandle, severityHand
               margin="normal"
               value={formData.fee}
               onChange={handleChange}
+              disabled={!((update && update.status === 'Upcoming') || update === null)}
             />
             <TextField
               label={t("reward")}
@@ -275,12 +283,14 @@ const AddTournamentModal = ({ open, onClose, update, processHandle, severityHand
               margin="normal"
               value={formData.reward}
               onChange={handleChange}
+              disabled={!((update && update.status === 'Upcoming') || update === null)}
             />
             <Box display="flex" alignItems="center" marginTop={2}>
               <DatePicker
                 label={t("startTime")}
                 value={dayjs(formData.start_time) || dayjs()}
                 onChange={(newValue) => handleStartDateChange(newValue)}
+                disabled={!((update && update.status === 'Upcoming') || update === null)}
                 slotProps={{
                   textField: {
                     variant: 'outlined',
@@ -294,6 +304,7 @@ const AddTournamentModal = ({ open, onClose, update, processHandle, severityHand
                 label={t("endTime")}
                 value={dayjs(formData.end_time) || dayjs()}
                 onChange={(newValue) => handleEndDateChange(newValue)}
+                disabled={!((update && update.status === 'Upcoming') || update === null)}
                 slotProps={{
                   textField: {
                     variant: 'outlined',
@@ -310,6 +321,7 @@ const AddTournamentModal = ({ open, onClose, update, processHandle, severityHand
               margin="normal"
               value={formData.limit}
               onChange={handleChange}
+              disabled={!((update && update.status === 'Upcoming') || update === null)}
             />
 
             
@@ -318,6 +330,7 @@ const AddTournamentModal = ({ open, onClose, update, processHandle, severityHand
                   multiple
                   options={data? data: []}
                   getOptionLabel={(option) => option.name}
+                  disabled={!((update && update.status === 'Upcoming') || update === null)}
                   onChange={(event, newValue) => {
                     setSelectedMember(newValue);
                     setFormData((prevData) => ({ ...prevData,
@@ -348,9 +361,11 @@ const AddTournamentModal = ({ open, onClose, update, processHandle, severityHand
                 name='status'
                 value={formData.status}
                 onChange={handleChange}
+                disabled={!((update && update.status === 'Upcoming') || update === null)}
               >
-                <MenuItem value="Active">{t("active")}</MenuItem>
-                <MenuItem value="InActive">{t("inactive")}</MenuItem>
+                <MenuItem value="Upcoming">{t("upcoming")}</MenuItem>
+                <MenuItem value="Live">{t("live")}</MenuItem>
+                <MenuItem value="Completed">{t("completed")}</MenuItem>
               </Select>
             </FormControl>
           </form>

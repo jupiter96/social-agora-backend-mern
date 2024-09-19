@@ -32,6 +32,11 @@ const editGame = async (req, res) => {
       return res.status(404).json({ error: "Game not found" });
     }
     if (imgUrl.includes("base64")) {
+      if (game.imgUrl) {
+        await cloudinary.uploader.destroy(
+          game.imgUrl.split("/").pop().split(".")[0]
+        );
+      }
       const uploadedResponse = await cloudinary.uploader.upload(imgUrl);
       imgUrl = uploadedResponse.secure_url;
     }

@@ -33,7 +33,7 @@ const getUserProfile = async (req, res) => {
 
 const signupUser = async (req, res) => {
   try {
-    let { name, email, username, password, profilePic, bio, role, member, expireDate } = req.body;
+    let { name, email, username, password, profilePic, bio, role, member, expireDate, level, exp, coin, group, tournament } = req.body;
     let user = await User.findOne({ $or: [{ email }, { username }] });
 
     if (user) {
@@ -41,6 +41,12 @@ const signupUser = async (req, res) => {
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+    
+    const images = [
+      "https://res.cloudinary.com/drv3pneh8/image/upload/v1726732773/oscpozuoes0ybpkgyqr2.png",
+      "https://res.cloudinary.com/drv3pneh8/image/upload/v1726732773/ieitybjoogznwt1ulw8b.png",
+      "https://res.cloudinary.com/drv3pneh8/image/upload/v1726732775/kbwq51itm7qxvlfrsr3f.png",
+      "https://res.cloudinary.com/drv3pneh8/image/upload/v1726732778/zvxobzta0rgwkxv58qnm.png"];
 
     if (profilePic) {
       const uploadedResponse = await cloudinary.uploader.upload(profilePic);
@@ -55,15 +61,20 @@ const signupUser = async (req, res) => {
       member: member? member: 'Free',
       expireDate: expireDate? expireDate: null,
       username,
-      profilePic: profilePic ? profilePic : 'https://res.cloudinary.com/drv3pneh8/image/upload/v1726447925/mbs4qsmyvwqzqxp9hmvq.png',
+      profilePic: profilePic ? profilePic : images[username.length % 4],
       password: hashedPassword,
+      level: level ? level : 1,
+      exp: exp ? exp : 0,
+      coin: coin ? coin : 0,
+      group: group ? group : 0,
+      tournament: tournament ? tournament : 0,
     });
     await newUser.save();
 
     if (newUser) {
       const token = generateToken(newUser._id, res);
 
-      res.status(201).json({
+      res.status(200).json({
         _id: newUser._id,
         name: newUser.name,
         email: newUser.email,
@@ -73,6 +84,11 @@ const signupUser = async (req, res) => {
         role: newUser.role,
         member: newUser.member,
         expireDate: newUser.expireDate,
+        level: newUser.level,
+        exp: newUser.exp,
+        coin: newUser.coin,
+        group: newUser.group,
+        tournament: newUser.tournament,
         token: token,
       });
     } else {
@@ -81,6 +97,77 @@ const signupUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: err.message });
     console.log("Error in signupUser: ", err.message);
+  }
+};
+
+
+
+const editUser = async (req, res) => {
+  let { name, email, username, password, profilePic, bio, role, member, expireDate, level, exp, coin, group, tournament } = req.body;
+  const images = [
+    "https://res.cloudinary.com/drv3pneh8/image/upload/v1726732773/oscpozuoes0ybpkgyqr2.png",
+    "https://res.cloudinary.com/drv3pneh8/image/upload/v1726732773/ieitybjoogznwt1ulw8b.png",
+    "https://res.cloudinary.com/drv3pneh8/image/upload/v1726732775/kbwq51itm7qxvlfrsr3f.png",
+    "https://res.cloudinary.com/drv3pneh8/image/upload/v1726732778/zvxobzta0rgwkxv58qnm.png"];
+  const userId = req.params.id;
+  try {
+    let user = await User.findById(userId);
+    if (!user) return res.status(400).json({ error: "User not found" });
+    
+    if(password != "") {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      user.password = hashedPassword;
+    }
+
+    if (profilePic.includes("base64")) {
+      if (user.profilePic) {
+        if(!images.includes(user.profilePic)){
+          await cloudinary.uploader.destroy(
+            user.profilePic.split("/").pop().split(".")[0]
+          );
+        }
+      }
+
+      const uploadedResponse = await cloudinary.uploader.upload(profilePic);
+      profilePic = uploadedResponse.secure_url;
+    }
+
+    user.name = name || user.name;
+    user.email = email || user.email;
+    user.username = username || user.username;
+    user.profilePic = profilePic || user.profilePic;
+    user.bio = bio || user.bio;
+    user.role = role || user.role;
+    user.member = member || user.member;
+    user.expireDate = expireDate || user.expireDate;
+    user.level = level || user.level;
+    user.exp = exp || user.exp;
+    user.coin = coin || user.coin;
+    user.group = group || user.group;
+    user.tournament = tournament || user.tournament;
+
+    user = await user.save();
+
+    // Find all posts that this user replied and update username and userProfilePic fields
+    await Post.updateMany(
+      { "replies.userId": userId },
+      {
+        $set: {
+          "replies.$[reply].username": user.username,
+          "replies.$[reply].userProfilePic": user.profilePic,
+        },
+      },
+      { arrayFilters: [{ "reply.userId": userId }] }
+    );
+
+    // password should be null in response
+    user.password = null;
+
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+    console.log("Error in updateUser: ", err.message);
   }
 };
 
@@ -113,6 +200,11 @@ const loginUser = async (req, res) => {
       role: user.role,
       member: user.member,
       expireDate: user.expireDate,
+      level: user.level,
+      exp: user.exp,
+      coin: user.coin,
+      group: user.group,
+      tournament: user.tournament,
       token: token,
     });
   } catch (error) {
@@ -178,67 +270,6 @@ const updateUser = async (req, res) => {
         .json({ error: "You cannot update other user's profile" });
 
     if (password) {
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
-      user.password = hashedPassword;
-    }
-
-    if (profilePic) {
-      if (user.profilePic) {
-        await cloudinary.uploader.destroy(
-          user.profilePic.split("/").pop().split(".")[0]
-        );
-      }
-
-      const uploadedResponse = await cloudinary.uploader.upload(profilePic);
-      profilePic = uploadedResponse.secure_url;
-    }
-
-    user.name = name || user.name;
-    user.email = email || user.email;
-    user.username = username || user.username;
-    user.profilePic = profilePic || user.profilePic;
-    user.bio = bio || user.bio;
-
-    user = await user.save();
-
-    // Find all posts that this user replied and update username and userProfilePic fields
-    await Post.updateMany(
-      { "replies.userId": userId },
-      {
-        $set: {
-          "replies.$[reply].username": user.username,
-          "replies.$[reply].userProfilePic": user.profilePic,
-        },
-      },
-      { arrayFilters: [{ "reply.userId": userId }] }
-    );
-
-    // password should be null in response
-    user.password = null;
-
-    res.status(200).json(user);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-    console.log("Error in updateUser: ", err.message);
-  }
-};
-
-const editUser = async (req, res) => {
-  const { name, email, username, password, bio } = req?.body;
-  let { profilePic } = req?.body;
-
-  const userId = req.params.id;
-  try {
-    let user = await User.findById(userId);
-    if (!user) return res.status(400).json({ error: "User not found" });
-
-    if (req.params.id !== userId.toString())
-      return res
-        .status(400)
-        .json({ error: "You cannot update other user's profile" });
-
-    if(password != "") {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
       user.password = hashedPassword;

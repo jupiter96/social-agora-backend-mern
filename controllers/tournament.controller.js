@@ -34,6 +34,11 @@ const editTournament = async (req, res) => {
       return res.status(404).json({ error: "tournament not found" });
     }
     if (imgUrl.includes("base64")) {
+      if (tournament.imgUrl) {
+        await cloudinary.uploader.destroy(
+          tournament.imgUrl.split("/").pop().split(".")[0]
+        );
+      }
       const uploadedResponse = await cloudinary.uploader.upload(imgUrl);
       imgUrl = uploadedResponse.secure_url;
     }
