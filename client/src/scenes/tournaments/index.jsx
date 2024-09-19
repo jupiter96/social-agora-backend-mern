@@ -25,7 +25,7 @@ const Tournaments = () => {
   
   const { data, isLoading, refetch } = useGetAllTournamentsQuery();
   const { data: getAllusers} = useGetAllusersQuery();
-  const userdata = [...getAllusers];
+  const userdata = getAllusers ? [...getAllusers] : [];
   console.log("userdata", userdata);
   const [ deleteTournament ] = useDeleteTournamentMutation();
   const { t } = useTranslation();
