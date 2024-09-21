@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import User from "../models/user.model.js";
+import Game from "../models/game.model.js";
 import Group from "../models/group.model.js";
 
 const createGroup = async (req, res) => {
@@ -13,8 +14,15 @@ const createGroup = async (req, res) => {
     }
     const newGroup = new Group({ group_name, game, imgUrl, adminUser, description, members });
     await newGroup.save();
-
-    await User.updateOne({ _id: adminUser }, { $inc: { exp: 50 } });
+    await Game.updateOne({ _id: game }, { $push: { group: newGroup._id } });
+    
+    const user = await User.findById(adminUser);
+    if (user) {
+      user.exp += 50;
+      user.coin -= 50;
+      user.group += 1;
+      await user.save();
+    }
 
     res.status(200).json(newGroup);
   } catch (err) {
@@ -113,11 +121,35 @@ const getGroup = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+
+const joinGroup = async (req, res) => {
+  try {
+    const group = await Group.findById(req.body?.group_id);
+
+    if (!group) {
+      return res.status(404).json({ error: "Group not found" });
+    }
+    group.members.push(req.body?.member_id);
+    await group.save();
+
+    const user = await User.findById(req.body?.member_id);
+    if (user) {
+      user.exp += 10
+      await user.save();
+    }
+
+    res.status(200).json(group);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 export {
   getGroups,
   getstatistics,
   createGroup,
   editGroup,
   getGroup,
+  joinGroup,
   deleteGroup
 };

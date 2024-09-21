@@ -38,7 +38,11 @@ const createPost = async (req, res) => {
     const newPost = new Post({ postedBy, text, img, widthRatio: 1, heightRatio: 1 });
     await newPost.save();
 
-    await User.updateOne({ _id: postedBy }, { $inc: { exp: 10 } });
+    if (user) {
+      user.exp += 10
+      await user.save();
+    }
+    
 
     res.status(200).json(newPost);
   } catch (err) {
@@ -144,17 +148,23 @@ const likeUnlikePost = async (req, res) => {
     }
 
     const userLikedPost = post.likes.includes(userId);
-
+    const user = await User.findById(userId);
     if (userLikedPost) {
       // Unlike post
       await Post.updateOne({ _id: postId }, { $pull: { likes: userId } });
-      await User.updateOne({ _id: userId }, { $inc: { exp: 5 } });
+      if (user) {
+        user.exp += 5
+        await user.save();
+      }
       res.status(200).json({ message: "Post unliked successfully" });
     } else {
       // Like post
       post.likes.push(userId);
       await post.save();
-      await User.updateOne({ _id: userId }, { $inc: { exp: 5 } });
+      if (user) {
+        user.exp += 5
+        await user.save();
+      }
       res.status(200).json({ message: "Post liked successfully" });
     }
   } catch (err) {
@@ -183,7 +193,11 @@ const replyToPost = async (req, res) => {
 
     post.replies.push(reply);
     await post.save();
-    await User.updateOne({ _id: userId }, { $inc: { exp: 15 } });
+    const user = await User.findById(userId);
+    if (user) {
+      user.exp += 5
+      await user.save();
+    }
 
     res.status(200).json(reply);
   } catch (err) {

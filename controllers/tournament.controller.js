@@ -5,16 +5,22 @@ import Tournament from "../models/tournament.model.js";
 
 const createTournament = async (req, res) => {
   try {
-    const { title, adminUser, type, description, start_time, end_time, fee, reward, limit, members, status } = req.body;
+    const { title, adminUser, type, game, description, start_time, end_time, fee, reward, limit, members, status } = req.body;
     let { imgUrl } = req.body;
 
     if (imgUrl) {
       const uploadedResponse = await cloudinary.uploader.upload(imgUrl);
       imgUrl = uploadedResponse.secure_url;
     }
-    const newtournament = new Tournament({ title, adminUser, type, description, start_time, end_time, fee, reward, limit, members, status, imgUrl });
+    const newtournament = new Tournament({ title, adminUser, type, game, description, start_time, end_time, fee, reward, limit, members, status, imgUrl });
     await newtournament.save();
-    await User.updateOne({ _id: adminUser }, { $inc: { exp: 100 } });
+    const user = await User.findById(adminUser);
+    if (user) {
+      user.exp += 100;
+      user.coin -= 150;
+      user.tournament += 1;
+      await user.save();
+    }
 
     res.status(200).json(newtournament);
   } catch (err) {
@@ -26,7 +32,7 @@ const createTournament = async (req, res) => {
 const editTournament = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, adminUser, type, description, start_time, end_time, fee, reward, limit, members, status } = req.body;
+    const { title, adminUser, type, game, description, start_time, end_time, fee, reward, limit, members, status } = req.body;
     let { imgUrl } = req.body;
 
     let tournament = await Tournament.findById(id);
@@ -49,6 +55,7 @@ const editTournament = async (req, res) => {
     tournament.adminUser = adminUser || tournament.adminUser;
     tournament.description = description || tournament.description;
     tournament.type = type || tournament.type;
+    tournament.game = game || tournament.game;
     tournament.start_time = start_time || tournament.start_time;
     tournament.end_time = end_time || tournament.end_time;
     tournament.fee = fee || tournament.fee;
@@ -119,11 +126,37 @@ const getTournament = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+
+
+const joinTournament = async (req, res) => {
+  try {
+    const tournament = await Tournament.findById(req.body?.tournament_id);
+
+    if (!tournament) {
+      return res.status(404).json({ error: "tournament not found" });
+    }
+    tournament.members.push(req.body?.member_id);
+    await tournament.save();
+
+    const user = await User.findById(req.body?.member_id);
+    if (user) {
+      user.exp += 30;
+      user.coin -= req.body?.fee;
+      await user.save();
+    }
+
+    res.status(200).json(tournament);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 export {
   getTournaments,
   getstatistics,
   createTournament,
   editTournament,
   getTournament,
+  joinTournament,
   deleteTournament
 };

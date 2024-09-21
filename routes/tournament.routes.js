@@ -7,6 +7,7 @@ import {
   getTournament,
   createTournament,
   deleteTournament,
+  joinTournament,
   editTournament
 } from "../controllers/tournament.controller.js";
 
@@ -19,6 +20,8 @@ router.route("/gettournamentstatistics").get(getstatistics);
 router.route("/:id").get(getTournament);
 
 router.route("/create").post(verifyJWT, createTournament);
+
+router.route("/join").post(verifyJWT, joinTournament);
 
 router.route("/:id").delete(verifyJWT, deleteTournament);
 

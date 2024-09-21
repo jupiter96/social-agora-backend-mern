@@ -23,13 +23,14 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { useCreateTournamentMutation, useEditTournamentMutation, useGetAllusersQuery } from "state/api";
+import { useCreateTournamentMutation, useEditTournamentMutation, useGetAllusersQuery, useGetAllGamesQuery } from "state/api";
 
 const AddTournamentModal = ({ open, onClose, update, processHandle, severityHandle, messageHandle, showToastHandle }) => {
   const [formData, setFormData] = useState({
     id: update?._id ? update._id:'',
     title: update?.title ? update.title:'',
     adminUser: update?.adminUser ? update.adminUser:'',
+    game: update?.game ? update.game:'',
     imgUrl: update?.imgUrl ? update.imgUrl:null,
     type: update?.type ? update.type:'',
     description: update?.description ? update.description:'',
@@ -49,6 +50,9 @@ const AddTournamentModal = ({ open, onClose, update, processHandle, severityHand
   const { data, refetch } = useGetAllusersQuery();
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedMember, setSelectedMember] = useState([]);
+  const { data: getAllGames } = useGetAllGamesQuery();
+  const gamedata = getAllGames;
+  const [selectedGame, setSelectedGame] = useState(null);
 
   const handleStartDateChange = (newValue) => {
     if (newValue && newValue.isValid()) {
@@ -138,6 +142,7 @@ const AddTournamentModal = ({ open, onClose, update, processHandle, severityHand
         id: update?._id ? update._id:'',
         title: update?.title ? update.title:'',
         adminUser: update?.adminUser ? update.adminUser:'',
+        game: update?.game ? update.game:'',
         imgUrl: update?.imgUrl ? update.imgUrl:null,
         type: update?.type ? update.type:'',
         description: update?.description ? update.description:'',
@@ -198,6 +203,44 @@ const AddTournamentModal = ({ open, onClose, update, processHandle, severityHand
                     <Image fontSize='40px' />
                   </IconButton>
                 </label>
+              </Box>
+            )}
+
+            
+
+          {update?._id ? (<TextField
+              label={t("game")}
+              name="game"
+              type="text"
+              fullWidth
+              margin="normal"
+              value={gamedata.find(game => game._id === formData.game) ? gamedata.find(game => game._id === formData.game).game_name + " ( " + formData.game + " )" : ""}
+              onChange={handleChange}
+              disabled
+            />):(
+              <Box marginTop={2}>
+              <Autocomplete
+                options={gamedata? gamedata: []}
+                getOptionLabel={(option) => option.game_name}
+                onChange={(event, newValue) => {
+                  setSelectedGame(newValue);
+                  setFormData((prevData) => ({ ...prevData, game: newValue._id }));
+
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label={t("selectGame")} variant="outlined" />
+                )}
+                
+                filterOptions={(options, { inputValue }) => {
+                  return options?.filter((option) =>
+                    option?.game_name.toLowerCase().includes(inputValue.toLowerCase())
+                  );
+                }}
+                
+                value={selectedGame}
+                isOptionEqualToValue={(option, value) => 
+                  option.id === value.id}
+              />
               </Box>
             )}
             <TextField
@@ -262,7 +305,7 @@ const AddTournamentModal = ({ open, onClose, update, processHandle, severityHand
                 disabled={!((update && update.status === 'Upcoming') || update === null)}
               >
                 <MenuItem value="Individual">{t("individual")}</MenuItem>
-                <MenuItem value="team">{t("team")}</MenuItem>
+                <MenuItem value="Team">{t("team")}</MenuItem>
               </Select>
             </FormControl>
             <TextField

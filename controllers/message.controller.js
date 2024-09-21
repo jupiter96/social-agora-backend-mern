@@ -59,7 +59,11 @@ async function sendMessage(req, res) {
     if (recipientSocketId) {
       io.to(recipientSocketId).emit("newMessage", newMessage);
     }
-    await User.updateOne({ _id: senderId }, { $inc: { exp: 2 } });
+    const user = await User.findById(senderId);
+    if (user) {
+      user.exp += 2
+      await user.save();
+    }
 
     res.status(201).json(newMessage);
   } catch (error) {

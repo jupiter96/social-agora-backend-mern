@@ -187,7 +187,10 @@ const loginUser = async (req, res) => {
       user.isFrozen = false;
       await user.save();
     }
-    await User.updateOne({ _id: user._id }, { $inc: { exp: 5 } });
+    if (user) {
+      user.exp += 5
+      await user.save();
+    }
 
     const token = generateToken(user._id, res);
 
@@ -380,10 +383,10 @@ const getstatistics = async (req, res) => {
 };
 const getCurrentUser = async (req, res) => {
   try {
-    // const userId = req?.user?._id;
-    // const user = await User.findById(userId);
+    const userId = req?.user?._id;
+    const user = await User.findById(userId);
 
-    res.status(200).json(req?.user);
+    res.status(200).json(user);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

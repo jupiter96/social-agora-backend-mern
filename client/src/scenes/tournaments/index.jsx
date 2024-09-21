@@ -321,23 +321,24 @@ const Tournaments = () => {
             alignItems: 'center',
             backdropFilter: 'blur(5px)',
           }}>
-            <div
-              style={{
-                backgroundColor: theme.palette.background.default,
-                height: '150px',
-                borderRadius: '8px',
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-                margin: '10px 0',
-                flex: 0.24,
-                flexDirection: 'column',
-                textAlign: 'center',
-                alignItems: 'center',
-                padding: '10px',
-                color: theme.palette.secondary.dark,
-              }}
-            >
-              <h5>{t('type')}:</h5>
-              <h4>{update?.type}</h4>
+              <div
+                style={{
+                  backgroundColor: theme.palette.background.default,
+                  height: '150px',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                  margin: '10px 0',
+                  flex: 0.24,
+                  flexDirection: 'column',
+                  textAlign: 'center',
+                  alignItems: 'center',
+                  padding: '10px',
+                  gap: 2,
+                  color: theme.palette.secondary.dark,
+                }}
+              >
+              <h5>{t('admin')}: <br></br> <big>{userdata?.filter((user)=>user._id === update?.adminUser)[0]?.name}</big></h5>
+              <h5>{t('type')}: <br></br> {update?.type}</h5>
             </div>
             <div
               style={{

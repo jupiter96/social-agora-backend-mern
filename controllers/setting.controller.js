@@ -54,7 +54,6 @@ const editBanner = async (req, res) => {
 };
 
 const getBanners = async (req, res) => {
-  console.log("ssssssssssss")
   try {
     const bannerList = await Banner.find().sort({
         createdAt: -1,

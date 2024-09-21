@@ -7,7 +7,8 @@ import {
   getGroup,
   createGroup,
   deleteGroup,
-  editGroup
+  editGroup,
+  joinGroup
 } from "../controllers/group.controller.js";
 
 const router = express.Router();
@@ -19,6 +20,8 @@ router.route("/getgroupstatistics").get(getstatistics);
 router.route("/:id").get(getGroup);
 
 router.route("/create").post(verifyJWT, createGroup);
+
+router.route("/join").post(verifyJWT, joinGroup);
 
 router.route("/:id").delete(verifyJWT, deleteGroup);
 

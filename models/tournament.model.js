@@ -11,6 +11,11 @@ const tournamentSchema = mongoose.Schema(
       ref: "User",
       required: true,
     },
+    game: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Game",
+      required: true,
+    },
     type: {
       type: String,
       default: 'Individual'
@@ -45,11 +50,12 @@ const tournamentSchema = mongoose.Schema(
     },
     members: {
       type: [mongoose.Schema.Types.ObjectId],
+      ref: "User",
       default: [],
     },
     status: {
       type: String,
-      required: true,
+      default: 'Upcoming'
     }
   },
   {

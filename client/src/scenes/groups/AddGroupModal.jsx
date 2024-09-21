@@ -33,8 +33,8 @@ const AddGroupModal = ({ open, onClose, update, processHandle, severityHandle, m
   const [editGroup] = useEditGroupMutation();
   const { data: getAllusers, refetch } = useGetAllusersQuery();
   const { data: getAllGames } = useGetAllGamesQuery();
-  const [selectedUser, setSelectedUser] = useState(null);
   const [selectedGame, setSelectedGame] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const userdata = getAllusers;
   const gamedata = getAllGames;

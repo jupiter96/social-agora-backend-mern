@@ -17,6 +17,11 @@ const gameSchema = mongoose.Schema(
     description: {
       type: String,
       required: true,
+    },
+    group: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "Group",
+      default: [],
     }
   },
   {
