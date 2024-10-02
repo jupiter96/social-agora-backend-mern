@@ -154,11 +154,31 @@ export const api = createApi({
       }),
       providesTags: ["Games"],
     }),
+    getAllCategories: build.query({
+      query: () => ({
+        url: "games/getcategories",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        }
+      }),
+      providesTags: ["Games"],
+    }),
     createGame: build.mutation({
       query: (game) => ({
         url: 'games/create',
         method: 'POST',
         body: game,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      providesTags: ['Games'],
+    }),
+    createCategory: build.mutation({
+      query: (category) => ({
+        url: 'games/addcategory',
+        method: 'POST',
+        body: category,
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
@@ -176,9 +196,30 @@ export const api = createApi({
       }),
       providesTags: ['Games'],
     }),
+    editCategory: build.mutation({
+      query: (category) => ({
+        url: `games/editcategory/${category.id}`,
+        method: 'PUT',
+        body: category,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      providesTags: ['Games'],
+    }),
     deleteGame: build.mutation({
       query: (id) => ({
         url: `games/${id}`,
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      providesTags: ['Games'],
+    }),
+    deleteCategory: build.mutation({
+      query: (id) => ({
+        url: `games/category/${id}`,
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -395,9 +436,13 @@ export const {
   useDeleteFeedMutation,
   
   useGetAllGamesQuery,
+  useGetAllCategoriesQuery,
   useCreateGameMutation,
+  useCreateCategoryMutation,
   useEditGameMutation,
+  useEditCategoryMutation,
   useDeleteGameMutation,
+  useDeleteCategoryMutation,
   
   useGetAllGroupsQuery,
   useCreateGroupMutation,

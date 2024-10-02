@@ -178,15 +178,6 @@ const navItems = [
             {/* Sidebar items */}
             <List>
               {navItems.map(({ text,title, icon }) => {
-                // if (!icon) {
-                //   return (
-                //     <Typography key={text} sx={{ m: "2rem 0 1rem 2rem" }}>
-                //       {title}
-                //     </Typography>
-                //   );
-                // }
-
-                // lowercase text
                 const lcText = text.toLowerCase();
 
                 return (

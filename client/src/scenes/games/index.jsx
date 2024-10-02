@@ -3,23 +3,28 @@ import { Box, useTheme, Button, CircularProgress, Dialog, DialogTitle, DialogCon
 import {
   AddCircle,
   Edit,
+  Category,
   Delete
 } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
 
-import { useGetAllGamesQuery, useDeleteGameMutation } from "state/api";
+import { useGetAllGamesQuery, useDeleteGameMutation, useGetAllCategoriesQuery } from "state/api";
 import { Header, FlexMobile, ToastNotification } from "components";
 import { useTranslation } from 'react-i18next';
 import AddGameModal from './AddGameModal';
+import AddCategoryModal from './AddCategoryModal';
 
 const Games = () => {
   
   const theme = useTheme();
   
   const { data, isLoading, refetch } = useGetAllGamesQuery();
+  const { data: getAllCategories } = useGetAllCategoriesQuery();
+  const categoryData = getAllCategories;
   const [ deleteGame ] = useDeleteGameMutation();
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const [openCategory, setOpenCategory] = useState(false);
   const [status, setStatus] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -37,6 +42,14 @@ const Games = () => {
   const handleClose = () => {
     setStatus(true);
     setOpen(false);
+  };
+
+  const handleCategoryOpen = () => {
+    setOpenCategory(true);
+  };
+
+  const handleCategoryClose = () => {
+    setOpenCategory(false);
   };
 
   
@@ -74,6 +87,9 @@ const Games = () => {
       field: "category",
       headerName: t("category"),
       flex: 0.5,
+      renderCell: (params) => (
+        <p>{categoryData?.filter((category)=>category._id === params.value)[0]?.category_name}</p>
+      ),
     },
     {
       field: "description",
@@ -150,6 +166,27 @@ const Games = () => {
         <Box>
           
           <Button
+            onClick={handleCategoryOpen}
+            sx={{
+              backgroundColor: theme.palette.secondary.light,
+              color: theme.palette.background.alt,
+              fontSize: "14px",
+              fontWeight: "bold",
+              padding: "10px 20px",
+              borderRadius: 50,
+              marginRight: '20px',
+
+              "&:hover": {
+                backgroundColor: theme.palette.background.alt,
+                color: theme.palette.secondary.light,
+              },
+            }}
+          >
+            <Category sx={{ mr: "10px" }} />
+            {t('category')}
+          </Button>
+          
+          <Button
             onClick={handleClickOpen}
             sx={{
               backgroundColor: theme.palette.secondary.light,
@@ -175,6 +212,14 @@ const Games = () => {
       open={open} 
       onClose={handleClose} 
       update={update} 
+      processHandle={setProcessing}
+      severityHandle={setSeverity}
+      messageHandle={setMessage}
+      showToastHandle={setShowToast} />
+
+      <AddCategoryModal 
+      open={openCategory} 
+      onClose={handleCategoryClose}
       processHandle={setProcessing}
       severityHandle={setSeverity}
       messageHandle={setMessage}

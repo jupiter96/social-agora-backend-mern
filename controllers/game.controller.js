@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import Game from "../models/game.model.js";
+import Category from "../models/category.model.js";
 
 const createGame = async (req, res) => {
   try {
@@ -14,6 +15,19 @@ const createGame = async (req, res) => {
     await newGame.save();
 
     res.status(200).json(newGame);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+    console.log(err);
+  }
+};
+
+const createCategory = async (req, res) => {
+  try {
+    const { category_name } = req.body;
+    const newCategory = new Category({ category_name });
+    await newCategory.save();
+
+    res.status(200).json(newCategory);
   } catch (err) {
     res.status(500).json({ error: err.message });
     console.log(err);
@@ -54,12 +68,45 @@ const editGame = async (req, res) => {
   }
 };
 
+
+const editCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { category_name } = req.body;
+
+    let category = await Category.findById(id);
+
+    if (!category) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    category.category_name = category_name || category.category_name;
+    category = await category.save();
+
+    res.status(200).json(category);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 const getGames = async (req, res) => {
   try {
     const gameList = await Game.find().sort({
         createdAt: -1,
       });
     res.status(200).json(gameList);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const getCategories = async (req, res) => {
+  try {
+    const categoryList = await Category.find().sort({
+        createdAt: -1,
+      });
+    res.status(200).json(categoryList);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -80,6 +127,21 @@ const deleteGame = async (req, res) => {
     await Game.findByIdAndDelete(req.params.id);
 
     res.status(200).json({ message: "Game deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const deleteCategory = async (req, res) => {
+  try {
+    const category = await Category.findById(req.params.id);
+    if (!category) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    await Category.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({ message: "Category deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -114,5 +176,9 @@ export {
   createGame,
   editGame,
   getGame,
-  deleteGame
+  deleteGame,
+  createCategory,
+  getCategories,
+  deleteCategory,
+  editCategory
 };

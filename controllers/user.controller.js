@@ -1,9 +1,13 @@
 import User from "../models/user.model.js";
 import Post from "../models/post.model.js";
+import Payment from "../models/payment.model.js";
 import generateToken from "../utils/helpers/generateToken.js";
 import bcrypt from "bcryptjs";
 import { v2 as cloudinary } from "cloudinary";
 import mongoose from "mongoose";
+import Stripe from 'stripe';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const getUserProfile = async (req, res) => {
   const { query } = req.params;
@@ -168,6 +172,140 @@ const editUser = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
     console.log("Error in updateUser: ", err.message);
+  }
+};
+
+
+const buyCoin = async (req, res) => {
+  const { amount, currency, userId } = req.body;
+
+  // Create payment intent
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: amount * 100, // Convert to cents
+    currency,
+    payment_method_types: ['card'],
+  });
+
+  res.status(200).send({
+    clientSecret: paymentIntent.client_secret,
+  });
+};
+
+
+const updateCoin = async (req, res) => {
+  const { coins, userId } = req.body;
+
+  try {
+    let user = await User.findById(userId);
+    if (!user) return res.status(400).json({ error: "User not found" });
+
+    user.exp = user.exp + (coins*2);
+    user.coin = user.coin + coins;
+
+    user = await user.save();
+
+    const newTransaction = new Payment({
+      user: userId,
+      amount: Number(coins)/100,
+      plan: "Agora Coin",
+      status: "Completed"
+    });
+    await newTransaction.save();
+
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+    console.log("Error in updatecoin: ", err.message);
+  }
+};
+
+const upgradeMember = async (req, res) => {
+  let { name, email, username, password, profilePic, bio, role, member, expireDate, level, exp, coin, group, tournament } = req.body;
+  const images = [
+    "https://res.cloudinary.com/drv3pneh8/image/upload/v1726732773/oscpozuoes0ybpkgyqr2.png",
+    "https://res.cloudinary.com/drv3pneh8/image/upload/v1726732773/ieitybjoogznwt1ulw8b.png",
+    "https://res.cloudinary.com/drv3pneh8/image/upload/v1726732775/kbwq51itm7qxvlfrsr3f.png",
+    "https://res.cloudinary.com/drv3pneh8/image/upload/v1726732778/zvxobzta0rgwkxv58qnm.png"];
+  const userId = req.params.id;
+  try {
+    let user = await User.findById(userId);
+    if (!user) return res.status(400).json({ error: "User not found" });
+    
+    if(password != "") {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      user.password = hashedPassword;
+    }
+
+    if (profilePic.includes("base64")) {
+      if (user.profilePic) {
+        if(!images.includes(user.profilePic)){
+          await cloudinary.uploader.destroy(
+            user.profilePic.split("/").pop().split(".")[0]
+          );
+        }
+      }
+
+      const uploadedResponse = await cloudinary.uploader.upload(profilePic);
+      profilePic = uploadedResponse.secure_url;
+    }
+
+    user.name = name || user.name;
+    user.email = email || user.email;
+    user.username = username || user.username;
+    user.profilePic = profilePic || user.profilePic;
+    user.bio = bio || user.bio;
+    user.role = role || user.role;
+    user.member = member || user.member;
+    user.expireDate = expireDate || user.expireDate;
+    user.level = level || user.level;
+    user.exp = exp || user.exp;
+    user.coin = coin || user.coin;
+    user.group = group || user.group;
+    user.tournament = tournament || user.tournament;
+
+    user = await user.save();
+
+    // Find all posts that this user replied and update username and userProfilePic fields
+    await Post.updateMany(
+      { "replies.userId": userId },
+      {
+        $set: {
+          "replies.$[reply].username": user.username,
+          "replies.$[reply].userProfilePic": user.profilePic,
+        },
+      },
+      { arrayFilters: [{ "reply.userId": userId }] }
+    );
+
+    // password should be null in response
+    user.password = null;
+
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+    console.log("Error in updateUser: ", err.message);
+  }
+};
+
+
+
+const updateMember = async (req, res) => {
+  const { coins, userId } = req.body;
+
+  try {
+    let user = await User.findById(userId);
+    if (!user) return res.status(400).json({ error: "User not found" });
+
+    user.exp = user.exp + (coins*2);
+    user.coin = user.coin + coins;
+
+    user = await user.save();
+
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+    console.log("Error in updatecoin: ", err.message);
   }
 };
 
@@ -463,4 +601,8 @@ export {
   getCurrentUser,
   SearchUser,
   HealthCheck,
+  buyCoin,
+  updateCoin,
+  upgradeMember,
+  updateMember
 };

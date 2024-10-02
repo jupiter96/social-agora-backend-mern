@@ -15,6 +15,10 @@ import {
   updateUser,
   deleteUser,
   editUser,
+  buyCoin,
+  updateCoin,
+  upgradeMember,
+  updateMember,
   getstatistics
 } from "../controllers/user.controller.js";
 
@@ -31,6 +35,14 @@ router.route("/suggested").get(verifyJWT, getSuggestedUsers);
 router.route("/signup").post(signupUser);
 
 router.route("/login").post(loginUser);
+
+router.route("/buycoin").post(buyCoin);
+
+router.route("/updatecoin").post(updateCoin);
+
+router.route("/upgrade").post(upgradeMember);
+
+router.route("/updatemember").post(updateMember);
 
 router.route("/logout").post(logoutUser);
 

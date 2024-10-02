@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import { PhotoCamera  } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { useCreateGameMutation, useEditGameMutation } from "state/api";
+import { useCreateGameMutation, useEditGameMutation, useGetAllCategoriesQuery } from "state/api";
 
 const AddGameModal = ({ open, onClose, update, processHandle, severityHandle, messageHandle, showToastHandle }) => {
   const [formData, setFormData] = useState({
@@ -31,6 +31,8 @@ const AddGameModal = ({ open, onClose, update, processHandle, severityHandle, me
   const { t } = useTranslation();
   const [createGame] = useCreateGameMutation();
   const [editGame] = useEditGameMutation();
+  const { data: getAllCategories } = useGetAllCategoriesQuery();
+  const categoryData = getAllCategories;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -171,8 +173,7 @@ const AddGameModal = ({ open, onClose, update, processHandle, severityHandle, me
                 value={formData.category}
                 onChange={handleChange}
               >
-                <MenuItem value="Mobile">{t("mobile")}</MenuItem>
-                <MenuItem value="PC">{t("pc")}</MenuItem>
+                {categoryData?.map((item, index)=>(<MenuItem value={item._id} key={index}>{item.category_name}</MenuItem>))}
               </Select>
             </FormControl>
             <TextField
