@@ -26,7 +26,6 @@ const Tournaments = () => {
   const { data, isLoading, refetch } = useGetAllTournamentsQuery();
   const { data: getAllusers} = useGetAllusersQuery();
   const userdata = getAllusers ? [...getAllusers] : [];
-  console.log("userdata", userdata);
   const [ deleteTournament ] = useDeleteTournamentMutation();
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -99,6 +98,9 @@ const Tournaments = () => {
       field: "adminUser",
       headerName: t("admin"),
       flex: 0.05,
+      renderCell: (params) => (
+        <p>{userdata?.filter((item)=>item._id === params.value)[0]?.username}</p>
+      ),
     },
     {
       field: "type",

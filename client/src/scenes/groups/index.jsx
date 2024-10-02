@@ -7,7 +7,7 @@ import {
 } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
 
-import { useGetAllGroupsQuery, useDeleteGroupMutation } from "state/api";
+import { useGetAllGroupsQuery, useDeleteGroupMutation, useGetAllusersQuery, useGetAllGamesQuery } from "state/api";
 import { Header, FlexMobile, ToastNotification } from "components";
 import { useTranslation } from 'react-i18next';
 import AddGroupModal from './AddGroupModal';
@@ -17,6 +17,10 @@ const Groups = () => {
   const theme = useTheme();
   
   const { data, isLoading, refetch } = useGetAllGroupsQuery();
+  const { data: getAllusers } = useGetAllusersQuery();
+  const userData = getAllusers;
+  const { data: getAllGames } = useGetAllGamesQuery();
+  const gameData = getAllGames;
   const [ deleteGroup ] = useDeleteGroupMutation();
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -74,11 +78,17 @@ const Groups = () => {
       field: "adminUser",
       headerName: t("admin"),
       flex: 0.5,
+      renderCell: (params) => (
+        <p>{userData?.filter((item)=>item._id === params.value)[0]?.username}</p>
+      ),
     },
     {
       field: "game",
       headerName: t("game"),
       flex: 0.5,
+      renderCell: (params) => (
+        <p>{gameData?.filter((item)=>item._id === params.value)[0]?.game_name}</p>
+      ),
     },
     {
       field: "description",

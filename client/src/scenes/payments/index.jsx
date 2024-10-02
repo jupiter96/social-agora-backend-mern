@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import { Box, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 
-import { useGetAllPaymentsQuery } from "state/api";
+import { useGetAllPaymentsQuery, useGetAllusersQuery } from "state/api";
 import { Header, FlexMobile } from "components";
 import { useTranslation } from 'react-i18next';
 
@@ -11,6 +11,8 @@ const Payments = () => {
   const theme = useTheme();
   
   const { data, isLoading } = useGetAllPaymentsQuery();
+  const { data: getAllusers } = useGetAllusersQuery();
+  const userData = getAllusers;
   const { t } = useTranslation();
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(8);
@@ -25,6 +27,9 @@ const Payments = () => {
       field: "user",
       headerName: t("user"),
       flex: 0.5,
+      renderCell: (params) => (
+        <p>{userData?.filter((item)=>item._id === params.value)[0]?.username}</p>
+      ),
     },
     {
       field: "amount",

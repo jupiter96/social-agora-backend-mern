@@ -7,7 +7,7 @@ import {
 } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
 
-import { useGetAllFeedsQuery, useDeleteFeedMutation } from "state/api";
+import { useGetAllFeedsQuery, useDeleteFeedMutation, useGetAllusersQuery } from "state/api";
 import { Header, FlexMobile, ToastNotification, DataGridCustomToolbar } from "components";
 import { useTranslation } from 'react-i18next';
 import AddFeedModal from './AddFeedModal';
@@ -17,6 +17,8 @@ const Feeds = () => {
   const theme = useTheme();
   
   const { data, isLoading, refetch } = useGetAllFeedsQuery();
+  const { data: getAllusers } = useGetAllusersQuery();
+  const userData = getAllusers;
   const [ deleteFeed ] = useDeleteFeedMutation();
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -92,6 +94,9 @@ const Feeds = () => {
       field: "postedBy",
       headerName: t("postedby"),
       flex: 0.1,
+      renderCell: (params) => (
+        <p>{userData?.filter((item)=>item._id === params.value)[0]?.username}</p>
+      ),
     },
     
     {
