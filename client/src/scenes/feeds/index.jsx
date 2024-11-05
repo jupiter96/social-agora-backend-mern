@@ -7,10 +7,11 @@ import {
 } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
 
-import { useGetAllFeedsQuery, useDeleteFeedMutation, useGetAllusersQuery } from "state/api";
+import { useGetAllFeedsQuery, useDeleteFeedMutation, useGetAllusersQuery, useGetAllHashTagsQuery } from "state/api";
 import { Header, FlexMobile, ToastNotification, DataGridCustomToolbar } from "components";
 import { useTranslation } from 'react-i18next';
 import AddFeedModal from './AddFeedModal';
+import AddHashTagModal from './AddHashTagModal';
 
 const Feeds = () => {
   
@@ -19,10 +20,13 @@ const Feeds = () => {
   const { data, isLoading, refetch } = useGetAllFeedsQuery();
   const { data: getAllusers } = useGetAllusersQuery();
   const userData = getAllusers;
+  const { data: getAllHashTags } = useGetAllHashTagsQuery();
+  const hashTagData = getAllHashTags;
   const [ deleteFeed ] = useDeleteFeedMutation();
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState(false);
+  const [openHashTag, setOpenHashTag] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [severity, setSeverity] = useState('success');
@@ -34,11 +38,10 @@ const Feeds = () => {
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [filteredData, setFilteredData] = useState(data);
-  console.log(sort, search);
 
   useEffect(() => {
     if (searchInput) {
-      const filtered = data.filter((row) =>
+      const filtered = data?.filter((row) =>
         Object.values(row).some((value) =>
           String(value).toLowerCase().includes(searchInput.toLowerCase())
         )
@@ -59,6 +62,15 @@ const Feeds = () => {
     setOpen(false);
   };
 
+
+  const handleHashTagOpen = () => {
+    setOpenHashTag(true);
+  };
+
+  const handleHashTagClose = () => {
+    setOpenHashTag(false);
+  };
+
   
   const hideToast = (event, reason) => {
     if (reason === 'clickaway') {
@@ -71,23 +83,38 @@ const Feeds = () => {
     {
       field: "_id",
       headerName: "ID",
-      flex: 0.2,
+      flex: 0.1,
     },
     {
       field: "text",
       headerName: t("text"),
-      flex: 0.2,
+      flex: 0.1,
     },
     {
       field: 'img',
       headerName: t("media"),
-      flex: 0.1,
+      flex: 0.07,
       renderCell: (params) => (
-        <img
-          src={params.value}
-          alt="media"
-          style={{ width: '80px', height: 'auto', padding: '10px' }}
-        />
+        <Box>
+          {params.value && (<img
+            src={params.value}
+            alt="media"
+            style={{ width: '80px', height: 'auto', padding: '10px' }}
+          />)}
+        </Box>
+      ),
+    },
+    {
+      field: 'video',
+      headerName: t("media"),
+      flex: 0.13,
+      renderCell: (params) => (
+        <Box>
+          {params.value && (<video width="200" controls>
+              <source src={params.value} type="video/mp4" />
+              Your browser does not support HTML video.
+          </video>)}
+        </Box>
       ),
     },
     {
@@ -114,6 +141,19 @@ const Feeds = () => {
       flex: 0.05,
       renderCell: (params) => (
         <h4>{params.value?.length}</h4>
+      ),
+    },
+    {
+      field: "hashtag",
+      headerName: t("hashtag"),
+      flex: 0.1,
+      renderCell: (params) => (
+        <p>
+          {hashTagData
+            ?.filter((hashtag) => params.value.includes(hashtag._id))
+            .map((hashtag) => hashtag.hashtag_name)
+            .join(", ")}
+        </p>
       ),
     },
     
@@ -195,6 +235,26 @@ const Feeds = () => {
         <Box>
           
           <Button
+            onClick={handleHashTagOpen}
+            sx={{
+              backgroundColor: theme.palette.secondary.light,
+              color: theme.palette.background.alt,
+              fontSize: "14px",
+              fontWeight: "bold",
+              padding: "10px 20px",
+              borderRadius: 50,
+              marginRight: '20px',
+
+              "&:hover": {
+                backgroundColor: theme.palette.background.alt,
+                color: theme.palette.secondary.light,
+              },
+            }}
+          >
+            # Hash Tag
+          </Button>
+          
+          <Button
             onClick={handleClickOpen}
             sx={{
               backgroundColor: theme.palette.secondary.light,
@@ -220,6 +280,14 @@ const Feeds = () => {
       open={open} 
       onClose={handleClose} 
       update={update} 
+      processHandle={setProcessing}
+      severityHandle={setSeverity}
+      messageHandle={setMessage}
+      showToastHandle={setShowToast} />
+
+      <AddHashTagModal 
+      open={openHashTag} 
+      onClose={handleHashTagClose}
       processHandle={setProcessing}
       severityHandle={setSeverity}
       messageHandle={setMessage}

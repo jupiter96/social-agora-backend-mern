@@ -1,11 +1,13 @@
 import { v2 as cloudinary } from "cloudinary";
 import User from "../models/user.model.js";
 import Post from "../models/post.model.js";
+import HashTag from "../models/hashtag.model.js";
 
 const createPost = async (req, res) => {
   try {
-    const { postedBy, text } = req.body;
-    let { img } = req.body;
+    const { postedBy, text, hashtag } = req.body;
+    let { img, video } = req.body;
+    let videoUrl;
     if (!postedBy || !text) {
       return res
         .status(400)
@@ -32,10 +34,20 @@ const createPost = async (req, res) => {
       const uploadedResponse = await cloudinary.uploader.upload(img);
       img = uploadedResponse.secure_url;
     }
-    const values = [1, 2];
-    const randomValue = values[Math.round(Math.random())];
 
-    const newPost = new Post({ postedBy, text, img, widthRatio: 1, heightRatio: 1 });
+    if (video) {
+      const uploadResult = await cloudinary.uploader.upload_stream(
+        { resource_type: 'video'},
+        (error, result) => {
+            if (error) return res.status(500).json(error);
+            videoUrl = result.secure_url;
+        }
+    );
+
+    video.stream.pipe(uploadResult);
+    }
+    video = videoUrl;
+    const newPost = new Post({ postedBy, text, img, video, hashtag, widthRatio: 1, heightRatio: 1 });
     await newPost.save();
 
     if (user) {
@@ -45,6 +57,19 @@ const createPost = async (req, res) => {
     
 
     res.status(200).json(newPost);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+    console.log(err);
+  }
+};
+
+const createHashTag = async (req, res) => {
+  try {
+    const { hashtag_name } = req.body;
+    const newHashTag = new HashTag({ hashtag_name });
+    await newHashTag.save();
+
+    res.status(200).json(newHashTag);
   } catch (err) {
     res.status(500).json({ error: err.message });
     console.log(err);
@@ -108,28 +133,73 @@ const deleteFeed = async (req, res) => {
   }
 };
 
+
+
+const deleteHashTag = async (req, res) => {
+  try {
+    const hashtag = await HashTag.findById(req.params.id);
+    if (!hashtag) {
+      return res.status(404).json({ error: "hashtag not found" });
+    }
+
+    await HashTag.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({ message: "hashtag deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 const editfeed = async (req, res) => {
   try {
     const { id } = req.params;
-    const { postedBy, text, createdAt } = req.body;
-    let { img } = req.body;
+    const { postedBy, text, hashtag, createdAt } = req.body;
+    let { img, video } = req.body;
 
     let post = await Post.findById(id);
 
     if (!post) {
       return res.status(404).json({ error: "Post not found" });
     }
-    if (img.includes("base64")) {
+    if (img?.includes("base64")) {
       const uploadedResponse = await cloudinary.uploader.upload(img);
       img = uploadedResponse.secure_url;
     }
+    if (video?.includes("base64")) {
+      const uploadedResponse = await cloudinary.uploader.upload_large(video, 
+        { resource_type: "video" });
+        video = uploadedResponse.secure_url;
+    }
     
     post.text = text || post.text;
-    post.img = img || post.img;
+    post.hashtag = hashtag || post.hashtag;
+    post.img = img || '';
+    post.video = video || '';
     post.createdAt = createdAt || post.createdAt;
     post = await post.save();
 
     res.status(200).json(post);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const editHashTag = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { hashtag_name } = req.body;
+
+    let hashtag = await HashTag.findById(id);
+
+    if (!hashtag) {
+      return res.status(404).json({ error: "hashtag not found" });
+    }
+
+    hashtag.hashtag_name = hashtag_name || hashtag.hashtag_name;
+    hashtag = await hashtag.save();
+
+    res.status(200).json(hashtag);
 
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -227,6 +297,18 @@ const getFeedPosts = async (req, res) => {
   }
 };
 
+
+const getHashTag = async (req, res) => {
+  try {
+    const hash = await HashTag.find().sort({
+        createdAt: -1,
+      });
+    res.status(200).json(hash);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 const getstatistics = async (req, res) => {
   try {
     const feedCount = await Post.countDocuments();
@@ -263,5 +345,9 @@ export {
   replyToPost,
   getFeedPosts,
   getUserPosts,
-  getstatistics
+  getstatistics,
+  getHashTag,
+  createHashTag,
+  editHashTag,
+  deleteHashTag
 };

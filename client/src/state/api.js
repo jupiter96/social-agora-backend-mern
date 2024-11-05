@@ -111,11 +111,31 @@ export const api = createApi({
       }),
       providesTags: ["Feeds"],
     }),
+    getAllHashTags: build.query({
+      query: () => ({
+        url: "posts/gethashtag",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        }
+      }),
+      providesTags: ["Feeds"],
+    }),
     createFeed: build.mutation({
       query: (feed) => ({
         url: 'posts/create',
         method: 'POST',
         body: feed,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      providesTags: ['Feeds'],
+    }),
+    createHashTag: build.mutation({
+      query: (hashtag) => ({
+        url: 'posts/createhashtag',
+        method: 'POST',
+        body: hashtag,
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
@@ -133,9 +153,30 @@ export const api = createApi({
       }),
       providesTags: ['Feeds'],
     }),
+    editHashTag: build.mutation({
+      query: (hashtag) => ({
+        url: `posts/edithashtag/${hashtag.id}`,
+        method: 'PUT',
+        body: hashtag,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      providesTags: ['Feeds'],
+    }),
     deleteFeed: build.mutation({
       query: (id) => ({
         url: `posts/deletefeed/${id}`,
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      providesTags: ['Feeds'],
+    }),
+    deleteHashTag: build.mutation({
+      query: (id) => ({
+        url: `posts/deletehashtag/${id}`,
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -431,9 +472,13 @@ export const {
   useDeleteUserMutation,
 
   useGetAllFeedsQuery,
+  useGetAllHashTagsQuery,
   useCreateFeedMutation,
+  useCreateHashTagMutation,
   useEditFeedMutation,
+  useEditHashTagMutation,
   useDeleteFeedMutation,
+  useDeleteHashTagMutation,
   
   useGetAllGamesQuery,
   useGetAllCategoriesQuery,

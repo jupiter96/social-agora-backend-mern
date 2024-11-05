@@ -9,6 +9,7 @@ import {
   IconButton,
   Box,
   Autocomplete,
+  Chip,
   useTheme
 } from '@mui/material';
 import { PhotoCamera  } from '@mui/icons-material';
@@ -17,23 +18,30 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { useCreateFeedMutation, useEditFeedMutation, useGetAllusersQuery } from "state/api";
+import { useCreateFeedMutation, useEditFeedMutation, useGetAllusersQuery, useGetAllHashTagsQuery } from "state/api";
 
 const AddFeedModal = ({ open, onClose, update, processHandle, severityHandle, messageHandle, showToastHandle }) => {
   const [formData, setFormData] = useState({
     id: update?._id ? update._id:'',
     text: update?.text ? update.text:'',
+    hashtag: update?.hashtag ? update.hashtag:[],
     postedBy: update?.postedBy ? update.postedBy:'',
     img: update?.img ? update.img:null,
+    video: update?.video ? update.video:null,
     createdAt: update?.createdAt ? dayjs(update.createdAt):dayjs(),
   });
-  const [imagePreview, setImagePreview] = useState(null);
+  
+  const [imagePreview, setImagePreview] = useState('');
+  const [videoPreview, setVideoPreview] = useState('');
   const theme = useTheme();
   const { t } = useTranslation();
   const [createFeed] = useCreateFeedMutation();
   const [editFeed] = useEditFeedMutation();
   const { data, refetch } = useGetAllusersQuery();
   const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedHashTag, setSelectedHashTag] = useState(null);
+  const { data: getAllHashTags } = useGetAllHashTagsQuery();
+  const hashtagData = getAllHashTags;
 
   const handleDateChange = (newValue) => {
     setFormData((prev) => ({ ...prev, createdAt: dayjs(newValue).toISOString() }))
@@ -47,18 +55,28 @@ const AddFeedModal = ({ open, onClose, update, processHandle, severityHandle, me
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-        setFormData((prevData) => ({ ...prevData, img: reader.result }));
-      };
-      reader.readAsDataURL(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            if (file.type.startsWith('video/')) {
+                setImagePreview(null);
+                setVideoPreview(reader.result);
+                setFormData((prevData) => ({ ...prevData, video: reader.result }));
+                setFormData((prevData) => ({ ...prevData, img: '' }));
+            } else if (file.type.startsWith('image/')) {
+                setVideoPreview(null);
+                setImagePreview(reader.result);
+                setFormData((prevData) => ({ ...prevData, img: reader.result }));
+                setFormData((prevData) => ({ ...prevData, video: '' }));
+            }
+        };
+        reader.readAsDataURL(file);
     }
-  };
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     processHandle(true);
+    console.log("asdasd", formData)
     if(update?._id){
       if(formData.postedBy !== '' && formData.text !== ''){
         try {
@@ -115,11 +133,18 @@ const AddFeedModal = ({ open, onClose, update, processHandle, severityHandle, me
       setFormData({
         id: update?._id ? update._id:'',
         text: update?.text ? update.text:'',
+        hashtag: update?.hashtag ? update.hashtag:'',
         postedBy: update?.postedBy ? update.postedBy:'',
         img: update?.img ? update.img:null,
+        video: update?.video ? update.video:null,
         createdAt: update?.createdAt ? dayjs(update.createdAt):dayjs(),
       });
-      setImagePreview(update?.img ? update.img:null);
+
+      setSelectedHashTag(hashtagData?.filter((hash)=> update?.hashtag?.includes(hash._id)));
+      if(!videoPreview){
+      setImagePreview(update?.img ? update.img:null);}
+      if(!imagePreview){
+      setVideoPreview(update?.video ? update.video:null);}
     }
     refetch();
   }, [update, refetch])
@@ -139,9 +164,15 @@ const AddFeedModal = ({ open, onClose, update, processHandle, severityHandle, me
               />
             </Box>
           )}
+          {videoPreview && (
+              <video width="400" controls>
+                  <source src={videoPreview} type="video/mp4" />
+                  Your browser does not support HTML video.
+              </video>
+          )}
             <Box display="flex" alignItems="center" justifyContent={"center"} marginTop={2}>
             <input
-              accept="image/*"
+              accept="image/*,video/*"
               style={{ display: 'none' }}
               id="profile-pic-upload"
               type="file"
@@ -196,8 +227,8 @@ const AddFeedModal = ({ open, onClose, update, processHandle, severityHandle, me
                 )}
                 
                 filterOptions={(options, { inputValue }) => {
-                  return options.filter((option) =>
-                    option.name.toLowerCase().includes(inputValue.toLowerCase())
+                  return options?.filter((option) =>
+                    option.name?.toLowerCase().includes(inputValue.toLowerCase())
                   );
                 }}
                 
@@ -206,6 +237,37 @@ const AddFeedModal = ({ open, onClose, update, processHandle, severityHandle, me
                   option.id === value.id}
               />
             )}
+
+            <Box marginTop={2}>
+              <Autocomplete
+                multiple
+                options={hashtagData? hashtagData: []}
+                getOptionLabel={(option) => option.hashtag_name}
+                onChange={(event, newValue) => {
+                  setSelectedHashTag(newValue);
+                  setFormData((prevData) => ({ ...prevData,
+                    hashtag: newValue.map(hashtag => hashtag._id),}));
+
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label={t("Hash Tag")} variant="outlined" />
+                )}
+                
+                filterOptions={(options, { inputValue }) => {
+                  return options?.filter((option) =>
+                    option?.hashtag_name?.toLowerCase().includes(inputValue.toLowerCase())
+                  );
+                }}
+                
+                value={selectedHashTag || []}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip variant="outlined" label={option.hashtag_name} {...getTagProps({ index })} />
+                  ))
+                }
+              />
+            </Box>
+
             <Box display="flex" alignItems="center" marginTop={2}>
               <DatePicker
                 label={t("createdAt")}

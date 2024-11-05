@@ -11,7 +11,11 @@ import {
   replyToPost,
   deleteFeed,
   editfeed,
-  getstatistics
+  getstatistics,
+  getHashTag,
+  createHashTag,
+  editHashTag,
+  deleteHashTag
 } from "../controllers/post.controller.js";
 
 const router = express.Router();
@@ -20,17 +24,25 @@ router.route("/feed").get(verifyJWT, getFeedPosts);
 
 router.route("/getfeedstatistics").get(getstatistics);
 
+router.route("/gethashtag").get(getHashTag);
+
 router.route("/:id").get(getPost);
 
 router.route("/user/:username").get(verifyJWT, getUserPosts);
 
 router.route("/create").post(verifyJWT, createPost);
 
+router.route("/createhashtag").post(verifyJWT, createHashTag);
+
 router.route("/:id").delete(verifyJWT, deletePost);
+
+router.route("/deletehashtag/:id").delete(verifyJWT, deleteHashTag);
 
 router.route("/deletefeed/:id").delete(verifyJWT, deleteFeed);
 
 router.route("/editfeed/:id").put(verifyJWT, editfeed);
+
+router.route("/edithashtag/:id").put(verifyJWT, editHashTag);
 
 router.route("/like/:id").put(verifyJWT, likeUnlikePost);
 

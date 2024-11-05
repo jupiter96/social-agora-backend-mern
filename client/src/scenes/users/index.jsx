@@ -33,9 +33,7 @@ const Users = () => {
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [filteredData, setFilteredData] = useState(data);
-  console.log(sort, search);
   const currentUser = useSelector((state) => state.global.userInfo);
-  console.log("current User", currentUser);
 
   
   useEffect(() => {
@@ -246,9 +244,7 @@ const Users = () => {
         mb="50px"
         sx={{
           overflowX: 'auto',
-          justifyItems: 'center',
-          alignItems: 'center',
-          margin: 'auto',
+          width: '100%',
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: theme.palette.background.alt,
             color: theme.palette.secondary[100],

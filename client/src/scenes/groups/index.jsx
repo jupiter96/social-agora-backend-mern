@@ -228,9 +228,7 @@ const Groups = () => {
         mb="50px"
         sx={{
           overflowX: 'auto',
-          justifyItems: 'center',
-          alignItems: 'center',
-          margin: 'auto',
+          width: '100%',
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: theme.palette.background.alt,
             color: theme.palette.secondary[100],

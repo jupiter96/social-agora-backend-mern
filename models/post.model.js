@@ -14,6 +14,9 @@ const postSchema = mongoose.Schema(
     img: {
       type: String,
     },
+    video: {
+      type: String,
+    },
     widthRatio: {
       type: Number,
     },
@@ -24,6 +27,13 @@ const postSchema = mongoose.Schema(
       // array of user ids
       type: [mongoose.Schema.Types.ObjectId],
       ref: "User",
+      default: [],
+    },
+    
+    hashtag: {
+      // array of user ids
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "HashTag",
       default: [],
     },
     replies: [
