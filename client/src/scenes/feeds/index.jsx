@@ -93,7 +93,7 @@ const Feeds = () => {
     {
       field: 'img',
       headerName: t("media"),
-      flex: 0.07,
+      flex: 0.05,
       renderCell: (params) => (
         <Box>
           {params.value && (<img
@@ -107,7 +107,7 @@ const Feeds = () => {
     {
       field: 'video',
       headerName: t("media"),
-      flex: 0.13,
+      flex: 0.15,
       renderCell: (params) => (
         <Box>
           {params.value && (<video width="200" controls>
@@ -345,6 +345,7 @@ const Feeds = () => {
           getRowId={(row) => row._id}
           rows={filteredData ? [...filteredData].reverse() : []}
           columns={columns}
+          rowHeight={150}
           rowsPerPageOptions={[8, 16, 32, 64]}
           onPageChange={(newPage) => setPage(newPage)}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
