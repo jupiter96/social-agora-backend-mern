@@ -80,7 +80,7 @@ const Users = () => {
         <img
           src={params.value}
           alt="media"
-          style={{ width: '100%', height: 'auto', borderRadius: '50%' }}
+          style={{ width: '100%', height: 'auto' }}
         />
       ),
     },
@@ -276,6 +276,7 @@ const Users = () => {
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           pagination
           page={page}
+          rowHeight={80}
           pageSize={pageSize}
           localeText={{
             footerTotalVisibleRows: (visibleCount, totalCount) => 

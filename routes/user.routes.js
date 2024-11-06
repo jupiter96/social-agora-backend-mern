@@ -17,6 +17,8 @@ import {
   editUser,
   buyCoin,
   updateCoin,
+  buyMembership,
+  updateMembership,
   upgradeMember,
   updateMember,
   getstatistics
@@ -35,6 +37,10 @@ router.route("/suggested").get(verifyJWT, getSuggestedUsers);
 router.route("/signup").post(signupUser);
 
 router.route("/login").post(loginUser);
+
+router.route("/buymembership").post(buyMembership);
+
+router.route("/updatemembership").post(updateMembership);
 
 router.route("/buycoin").post(buyCoin);
 

@@ -15,7 +15,8 @@ import {
   getHashTag,
   createHashTag,
   editHashTag,
-  deleteHashTag
+  deleteHashTag,
+  getUserHashTag
 } from "../controllers/post.controller.js";
 
 const router = express.Router();
@@ -27,6 +28,8 @@ router.route("/getfeedstatistics").get(getstatistics);
 router.route("/gethashtag").get(getHashTag);
 
 router.route("/:id").get(getPost);
+
+router.route("/getuserhashtag/:id").get(getUserHashTag);
 
 router.route("/user/:username").get(verifyJWT, getUserPosts);
 

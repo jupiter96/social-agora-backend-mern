@@ -63,6 +63,7 @@ const signupUser = async (req, res) => {
       bio,
       role: role? role: 'User',
       member: member? member: 'Free',
+      plan: '',
       expireDate: expireDate? expireDate: null,
       username,
       profilePic: profilePic ? profilePic : images[username.length % 4],
@@ -87,6 +88,7 @@ const signupUser = async (req, res) => {
         profilePic: newUser.profilePic,
         role: newUser.role,
         member: newUser.member,
+        plan: newUser.plan,
         expireDate: newUser.expireDate,
         level: newUser.level,
         exp: newUser.exp,
@@ -175,6 +177,77 @@ const editUser = async (req, res) => {
   }
 };
 
+const buyMembership = async (req, res) => {
+  const monthlyPriceId = 'price_1QI3JJRqSOK3QhQfR99YAk2j';
+  const annualPriceId = 'price_1QI3KHRqSOK3QhQfMCfaG7JS';
+  const { email, name, paymentMethodId, subscriptionType } = req.body; // subscriptionType can be 'monthly' or 'annual'
+  
+
+  try {
+    const customer = await stripe.customers.create({
+      email,
+      name,
+      payment_method: paymentMethodId,
+      invoice_settings: {
+        default_payment_method: paymentMethodId,
+      },
+    });
+    console.log('Customer ID:', customer.id);
+    
+    const subscription = await stripe.subscriptions.create({
+      customer: customer.id,
+      items: [{ price: subscriptionType === 'monthly' ? monthlyPriceId : annualPriceId }],
+      expand: ['latest_invoice.payment_intent'],
+    });
+    console.log('subscription.latest_invoice.payment_intent.client_secret', subscription.latest_invoice.payment_intent.client_secret);
+
+    res.status(200).send({
+      clientSecret: subscription.latest_invoice.payment_intent.client_secret,
+    });
+  } catch (error) {
+    console.error('Error creating subscription:', error);
+    res.status(500).send({ error: 'Subscription creation failed' });
+  }
+};
+
+const updateMembership = async (req, res) => {
+  const { subscriptionType, userId } = req.body;
+  const currentDate = new Date();
+
+  try {
+    let user = await User.findById(userId);
+    if (!user) return res.status(400).json({ error: "User not found" });
+
+    if(subscriptionType === 'monthly'){
+      user.exp = user.exp + 100;
+      user.member = 'Paid';
+      user.plan = 'Monthly';
+      currentDate.setMonth(currentDate.getMonth() + 1);
+      user.expireDate = [currentDate.toISOString()];
+    }else if(subscriptionType === 'annual'){
+      user.exp = user.exp + 500;
+      user.member = 'Paid';
+      user.plan = 'Annual';
+      currentDate.setFullYear(currentDate.getFullYear() + 1);
+      user.expireDate = [currentDate.toISOString()];
+    }
+
+    user = await user.save();
+
+    const newTransaction = new Payment({
+      user: userId,
+      amount: subscriptionType === 'monthly' ? 3.99 : 39.99,
+      plan: "Agora Membership",
+      status: "Completed"
+    });
+    await newTransaction.save();
+
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+    console.log("Error in updateMembership: ", err.message);
+  }
+};
 
 const buyCoin = async (req, res) => {
   const { amount, currency, userId } = req.body;
@@ -200,7 +273,17 @@ const updateCoin = async (req, res) => {
     if (!user) return res.status(400).json({ error: "User not found" });
 
     user.exp = user.exp + (coins*2);
-    user.coin = user.coin + coins;
+    if(coins === 99){
+      user.coin = user.coin + 100;
+    }else if(coins === 198){
+      user.coin = user.coin + 200;
+    }else if(coins === 470){
+      user.coin = user.coin + 500;
+    }else if(coins === 941){
+      user.coin = user.coin + 1000;
+    }else if(coins === 4699){
+      user.coin = user.coin + 5000;
+    }
 
     user = await user.save();
 
@@ -341,6 +424,7 @@ const loginUser = async (req, res) => {
       profilePic: user.profilePic,
       role: user.role,
       member: user.member,
+      plan: user.plan,
       expireDate: user.expireDate,
       level: user.level,
       exp: user.exp,
@@ -604,5 +688,7 @@ export {
   buyCoin,
   updateCoin,
   upgradeMember,
-  updateMember
+  updateMember,
+  buyMembership,
+  updateMembership,
 };

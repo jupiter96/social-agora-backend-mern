@@ -50,6 +50,10 @@ const userSchema = mongoose.Schema(
       type: String,
       default: 'Free'
     },
+    plan: {
+      type: String,
+      default: 'Monthly'
+    },
     level: {
       type: Number,
       default: 1

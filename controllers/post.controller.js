@@ -7,7 +7,6 @@ const createPost = async (req, res) => {
   try {
     const { postedBy, text, hashtag } = req.body;
     let { img, video } = req.body;
-    let videoUrl;
     if (!postedBy || !text) {
       return res
         .status(400)
@@ -35,18 +34,12 @@ const createPost = async (req, res) => {
       img = uploadedResponse.secure_url;
     }
 
-    if (video) {
-      const uploadResult = await cloudinary.uploader.upload_stream(
-        { resource_type: 'video'},
-        (error, result) => {
-            if (error) return res.status(500).json(error);
-            videoUrl = result.secure_url;
-        }
-    );
-
-    video.stream.pipe(uploadResult);
+    
+    if (video?.includes("base64")) {
+      const uploadedResponse = await cloudinary.uploader.upload_large(video, 
+        { resource_type: "video" });
+        video = uploadedResponse.secure_url;
     }
-    video = videoUrl;
     const newPost = new Post({ postedBy, text, img, video, hashtag, widthRatio: 1, heightRatio: 1 });
     await newPost.save();
 
@@ -299,11 +292,46 @@ const getFeedPosts = async (req, res) => {
 
 
 const getHashTag = async (req, res) => {
+  const hashtagCounts = {};
   try {
     const hash = await HashTag.find().sort({
         createdAt: -1,
       });
     res.status(200).json(hash);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const getUserHashTag = async (req, res) => {
+  try {
+    const hash = await HashTag.find().sort({
+        createdAt: -1,
+      });
+    const posts = await Post.find({postedBy: req.params.id});
+
+    if (!posts) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    const hashtagCounts = {};
+
+    posts.forEach(post => {
+      post.hashtag.forEach(hashtagId => {
+        if (!hashtagCounts[hashtagId]) {
+            hashtagCounts[hashtagId] = 0;
+        }
+        hashtagCounts[hashtagId]++;
+    });
+    });
+
+    const popularHashtags = Object.entries(hashtagCounts)
+        .map(([id, count], index) => {
+            const hashtag = hash.filter(h => h._id.toString() === id);
+            return { hashtagId: id, hashtag_name: hashtag[0]?.hashtag_name, count };
+        })
+        .sort((a, b) => b.count - a.count);
+    res.status(200).json(popularHashtags);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -349,5 +377,6 @@ export {
   getHashTag,
   createHashTag,
   editHashTag,
-  deleteHashTag
+  deleteHashTag,
+  getUserHashTag
 };
