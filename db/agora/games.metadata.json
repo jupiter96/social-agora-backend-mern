@@ -1,1 +1,1 @@
-{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"agora.games"}],"uuid":"5c3cab2a3ec0436b8d0aeaa8ef8793bd"}
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"agora.games"}],"uuid":"78a786fa11ad44f88527526c443d84ab"}

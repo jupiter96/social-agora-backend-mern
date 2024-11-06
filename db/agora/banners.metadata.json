@@ -1,1 +1,1 @@
-{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"agora.banners"}],"uuid":"392da9adfca548249478a07d4765d970"}
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"agora.banners"}],"uuid":"9ae356af128f4dcb9a6a9d2ec01ed6db"}
