@@ -80,12 +80,12 @@ const Tournaments = () => {
     {
       field: "title",
       headerName: t("title"),
-      flex: 0.1,
+      flex: 0.15,
     },
     {
       field: 'imgUrl',
       headerName: t("media"),
-      flex: 0.1,
+      flex: 0.05,
       renderCell: (params) => (
         <img
           src={params.value}
@@ -97,7 +97,7 @@ const Tournaments = () => {
     {
       field: "adminUser",
       headerName: t("admin"),
-      flex: 0.05,
+      flex: 0.07,
       renderCell: (params) => (
         <p>{userdata?.filter((item)=>item._id === params.value)[0]?.username}</p>
       ),
@@ -110,12 +110,12 @@ const Tournaments = () => {
     {
       field: "fee",
       headerName: t("fee"),
-      flex: 0.05,
+      flex: 0.04,
     },
     {
       field: "reward",
       headerName: t("reward"),
-      flex: 0.05,
+      flex: 0.04,
     },
     
     {
@@ -123,7 +123,7 @@ const Tournaments = () => {
       headerName: t("startTime"),
       flex: 0.1,
       renderCell: (params) => (
-        <h4>{params.value?.split("T")[0]} {params.value?.split("T")[0].split(".")[0]}</h4>
+        <h4>{params.value?.split("T")[0]} {params.value?.split("T")[1].split(".")[0]}</h4>
       ),
     },
     
@@ -132,7 +132,7 @@ const Tournaments = () => {
       headerName: t("endTime"),
       flex: 0.1,
       renderCell: (params) => (
-        <h4>{params.value?.split("T")[0]} {params.value?.split("T")[0].split(".")[0]}</h4>
+        <h4>{params.value?.split("T")[0]} {params.value?.split("T")[1].split(".")[0]}</h4>
       ),
     },
     {
@@ -487,7 +487,7 @@ const Tournaments = () => {
         <DataGrid
           loading={isLoading || !data}
           getRowId={(row) => row._id}
-          rows={data ? [...data].reverse() : []}
+          rows={data ? [...data] : []}
           columns={columns}
           onPageChange={(newPage) => setPage(newPage)}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}

@@ -37,17 +37,17 @@ router.route("/create").post(verifyJWT, createPost);
 
 router.route("/createhashtag").post(verifyJWT, createHashTag);
 
-router.route("/:id").delete(verifyJWT, deletePost);
-
-router.route("/deletehashtag/:id").delete(verifyJWT, deleteHashTag);
-
-router.route("/deletefeed/:id").delete(verifyJWT, deleteFeed);
-
 router.route("/editfeed/:id").put(verifyJWT, editfeed);
 
 router.route("/edithashtag/:id").put(verifyJWT, editHashTag);
 
 router.route("/like/:id").put(verifyJWT, likeUnlikePost);
+
+router.route("/:id").delete(verifyJWT, deletePost);
+
+router.route("/deletehashtag/:id").delete(verifyJWT, deleteHashTag);
+
+router.route("/deletefeed/:id").delete(verifyJWT, deleteFeed);
 
 router.route("/reply/:id").put(verifyJWT, replyToPost);
 

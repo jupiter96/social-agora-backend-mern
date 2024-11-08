@@ -6,8 +6,9 @@ const createGame = async (req, res) => {
   try {
     const { game_name, category, description } = req.body;
     let { imgUrl } = req.body;
+    // console.log(game_name, category, description)
 
-    if (imgUrl) {
+    if (imgUrl.includes('base64')) {
       const uploadedResponse = await cloudinary.uploader.upload(imgUrl);
       imgUrl = uploadedResponse.secure_url;
     }
@@ -150,8 +151,20 @@ const deleteCategory = async (req, res) => {
 
 const getstatistics = async (req, res) => {
   try {
+    // Get total game count
     const gameCount = await Game.countDocuments();
-    res.status(200).json({gameCount: gameCount});
+  
+    // Get the start of the current month
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1); // Set to the first day of the current month
+    startOfMonth.setHours(0, 0, 0, 0); // Set hours to 00:00:00 for accurate comparison
+  
+    // Get game count added this month
+    const monthlyGameCount = await Game.countDocuments({
+      createdAt: { $gte: startOfMonth } // Filter games created from the start of the month
+    });
+  
+    res.status(200).json({ gameCount, monthlyGameCount });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -63,6 +63,10 @@ export const api = createApi({
       providesTags: ["Tournaments"],
     }),
 
+    getChartData: build.query({
+      query: () => "payments/getpaymentchart",
+      providesTags: ["Payments"],
+    }),
 
     //***************    Users   **********************
     getAllusers: build.query({
@@ -465,6 +469,8 @@ export const {
   useGetNotificationStatisticsQuery,
   useGetPaymentStatisticsQuery,
   useGetTournamentStatisticsQuery,
+
+  useGetChartDataQuery,
 
   useGetAllusersQuery,
   useCreateUserMutation,

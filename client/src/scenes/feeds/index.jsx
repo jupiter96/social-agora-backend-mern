@@ -39,6 +39,7 @@ const Feeds = () => {
   const [searchInput, setSearchInput] = useState("");
   const [filteredData, setFilteredData] = useState(data);
 
+  console.log(sort, search)
   useEffect(() => {
     if (searchInput) {
       const filtered = data?.filter((row) =>
@@ -343,7 +344,7 @@ const Feeds = () => {
         <DataGrid
           loading={isLoading || !filteredData}
           getRowId={(row) => row._id}
-          rows={filteredData ? [...filteredData].reverse() : []}
+          rows={filteredData ? [...filteredData] : []}
           columns={columns}
           rowHeight={150}
           rowsPerPageOptions={[8, 16, 32, 64]}

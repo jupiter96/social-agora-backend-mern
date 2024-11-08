@@ -11,7 +11,6 @@ import { useGetAllusersQuery, useDeleteUserMutation } from "state/api";
 import { Header, FlexMobile, ToastNotification, DataGridCustomToolbar } from "components";
 import { useTranslation } from 'react-i18next';
 import AddUserModal from './AddUserModal';
-import { useSelector } from "react-redux";
 
 const Users = () => {
   
@@ -33,7 +32,7 @@ const Users = () => {
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [filteredData, setFilteredData] = useState(data);
-  const currentUser = useSelector((state) => state.global.userInfo);
+  console.log(sort, search)
 
   
   useEffect(() => {

@@ -35,11 +35,12 @@ const Games = () => {
   const [pageSize, setPageSize] = useState(8);
 
   const handleClickOpen = () => {
-    setUpdate([]);
+    setUpdate(null);
     setOpen(true);
   };
 
   const handleClose = () => {
+    setUpdate(null);
     setStatus(true);
     setOpen(false);
   };
@@ -64,12 +65,12 @@ const Games = () => {
     {
       field: "_id",
       headerName: "ID",
-      flex: 0.5,
+      flex: 0.1,
     },
     {
       field: "game_name",
       headerName: t("title"),
-      flex: 0.5,
+      flex: 0.15,
     },
     {
       field: 'imgUrl',
@@ -86,7 +87,7 @@ const Games = () => {
     {
       field: "category",
       headerName: t("category"),
-      flex: 0.5,
+      flex: 0.15,
       renderCell: (params) => (
         <p>{categoryData?.filter((category)=>category._id === params.value)[0]?.category_name}</p>
       ),
@@ -94,12 +95,12 @@ const Games = () => {
     {
       field: "description",
       headerName: t("description"),
-      flex: 0.5,
+      flex: 0.25,
     },
     {
       field: "actions",
       headerName: t("action"),
-      flex: 0.5,
+      flex: 0.15,
       renderCell: (params) => (
         <div>
           <Button 
@@ -275,7 +276,7 @@ const Games = () => {
         <DataGrid
           loading={isLoading || !data}
           getRowId={(row) => row._id}
-          rows={data ? [...data].reverse() : []}
+          rows={data ? [...data] : []}
           columns={columns}
           rowsPerPageOptions={[8, 16, 32, 64]}
           onPageChange={(newPage) => setPage(newPage)}

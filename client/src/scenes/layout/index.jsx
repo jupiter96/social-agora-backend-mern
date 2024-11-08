@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, useMediaQuery } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import { Navbar, Sidebar } from "components";
+import { isMobile, isTablet, isDesktop } from 'react-device-detect';
 
 // Layout
 const Layout = () => {
@@ -13,6 +14,13 @@ const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   
   const data = useSelector((state) => state.global.userInfo);
+  useEffect(()=>{
+    if(isMobile || isTablet){
+      setIsSidebarOpen(false);
+    }else if(isDesktop){
+      setIsSidebarOpen(true);
+    }
+  },[])
   
   return (
     <Box display={isNonMobile ? "flex" : "block"} width="100%" height="100%">

@@ -106,8 +106,20 @@ const deleteTournament = async (req, res) => {
 
 const getstatistics = async (req, res) => {
   try {
+    // Get total tournament count
     const tournamentCount = await Tournament.countDocuments();
-    res.status(200).json({tournamentCount: tournamentCount});
+  
+    // Get the start of the current month
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1); // Set to the first day of the current month
+    startOfMonth.setHours(0, 0, 0, 0); // Set hours to 00:00:00 for accurate comparison
+  
+    // Get tournament count added this month
+    const monthlyTournamentCount = await Tournament.countDocuments({
+      createdAt: { $gte: startOfMonth } // Filter tournaments created from the start of the month
+    });
+  
+    res.status(200).json({ tournamentCount, monthlyTournamentCount });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

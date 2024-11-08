@@ -237,7 +237,7 @@ const updateMembership = async (req, res) => {
     const newTransaction = new Payment({
       user: userId,
       amount: subscriptionType === 'monthly' ? 3.99 : 39.99,
-      plan: "Agora Membership",
+      plan: subscriptionType === 'monthly' ? "Monthly Membership":"Annual Membership",
       status: "Completed"
     });
     await newTransaction.save();
@@ -597,8 +597,19 @@ const getAllUsers = async (req, res) => {
 };
 const getstatistics = async (req, res) => {
   try {
-    const userCount = await User.countDocuments(); 
-    res.status(200).json({totalUser: userCount});
+    // Get total user count
+    const totalUserCount = await User.countDocuments();
+  
+    // Get the start of the current month
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1); // Set to the first day of the current month
+    startOfMonth.setHours(0, 0, 0, 0); // Set hours to 00:00:00 for accurate comparison
+  
+    // Get user count registered this month
+    const monthlyUserCount = await User.countDocuments({
+      createdAt: { $gte: startOfMonth } // Filter users created from the start of the month
+    });
+    res.status(200).json({ totalUser: totalUserCount, monthlyUserCount });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

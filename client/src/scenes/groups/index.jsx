@@ -253,7 +253,7 @@ const Groups = () => {
         <DataGrid
           loading={isLoading || !data}
           getRowId={(row) => row._id}
-          rows={data ? [...data].reverse() : []}
+          rows={data ? [...data] : []}
           columns={columns}
           onPageChange={(newPage) => setPage(newPage)}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}

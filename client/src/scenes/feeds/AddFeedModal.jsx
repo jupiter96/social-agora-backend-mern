@@ -147,7 +147,7 @@ const AddFeedModal = ({ open, onClose, update, processHandle, severityHandle, me
       setVideoPreview(update?.video ? update.video:null);}
     }
     refetch();
-  }, [update, refetch])
+  }, [update, refetch, hashtagData, imagePreview, videoPreview])
   return (
     <Dialog open={open} onClose={onClose}>
       {update?._id ? (<DialogTitle>{t("edit")} Feed</DialogTitle>) : (<DialogTitle>{t("addFeed")}</DialogTitle>)}

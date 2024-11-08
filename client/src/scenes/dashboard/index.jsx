@@ -178,7 +178,7 @@ const Dashboard = () => {
         <StatBox
           title={t("totalUsers")}
           value={data ? data.totalUser : 0}
-          increase={14}
+          increase={data ? data.monthlyUserCount : 0}
           description={t("lastMonth")}
           icon={
             <Group
@@ -191,7 +191,7 @@ const Dashboard = () => {
         <StatBox
           title={t("totalGames")}
           value={data?.gameCount ? data.gameCount: 0}
-          increase={21}
+          increase={data?.monthlyGameCount ? data.monthlyGameCount : 0}
           description={t("lastMonth")}
           icon={
             <SportsEsports
@@ -203,7 +203,7 @@ const Dashboard = () => {
         <StatBox
           title={t("totalGroups")}
           value={data?.groupCount ? data.groupCount: 0}
-          increase={-5}
+          increase={data?.monthlyGroupCount ? data.monthlyGroupCount : 0}
           description={t("lastMonth")}
           icon={
             <Diversity1
@@ -215,8 +215,8 @@ const Dashboard = () => {
         {/* Yearly Sales */}
         <StatBox
           title={t("totalFeeds")}
-          value={data && data.postCount}
-          increase={43}
+          value={data ? data.postCount : 0}
+          increase={data ? data.monthlyPostCount : 0}
           description={t("lastMonth")}
           icon={
             <Wifi
@@ -228,7 +228,7 @@ const Dashboard = () => {
         <StatBox
           title={t("totalPayments")}
           value={data.totalAmount ? `$${data.totalAmount}`: "$0"}
-          increase={32}
+          increase={data.monthlyTotal ? `$${data.monthlyTotal}`: "$0"}
           description={t("lastMonth")}
           icon={
             <Paid
@@ -253,7 +253,7 @@ const Dashboard = () => {
         <StatBox
           title={t("totalTournaments")}
           value={data.tournamentCount ? data.tournamentCount:0}
-          increase={-13}
+          increase={data.monthlyTournamentCount ? data.monthlyTournamentCount:0}
           description={t("lastMonth")}
           icon={
             <LocalFireDepartment

@@ -31,7 +31,7 @@ const StatBox = ({ title, value, increase, icon, description }) => {
 
       {/* value */}
       <Typography
-        variant="h3"
+        variant="h2"
         fontWeight="600"
         sx={{ color: theme.palette.secondary[200] }}
       >
@@ -41,11 +41,11 @@ const StatBox = ({ title, value, increase, icon, description }) => {
       <FlexBetween gap="1rem">
         {/* increase % */}
         <Typography
-          variant="h5"
+          variant="h4"
           fontStyle="italic"
-          sx={increase > 0 ? { color: "green" } : { color: "red" }}
+          sx={increase !== 0 ? { color: "green" } : { color: "red" }}
         >
-          {increase > 0 ? "+":""}{increase}%
+          {increase !== 0 ? "+ ":""}{increase}
         </Typography>
 
         {/* description */}

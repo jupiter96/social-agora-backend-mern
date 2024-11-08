@@ -292,7 +292,6 @@ const getFeedPosts = async (req, res) => {
 
 
 const getHashTag = async (req, res) => {
-  const hashtagCounts = {};
   try {
     const hash = await HashTag.find().sort({
         createdAt: -1,
@@ -339,8 +338,20 @@ const getUserHashTag = async (req, res) => {
 
 const getstatistics = async (req, res) => {
   try {
-    const feedCount = await Post.countDocuments();
-    res.status(200).json({postCount: feedCount});
+    // Get total post count
+    const postCount = await Post.countDocuments();
+  
+    // Get the start of the current month
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1); // Set to the first day of the current month
+    startOfMonth.setHours(0, 0, 0, 0); // Set hours to 00:00:00 for accurate comparison
+  
+    // Get post count added this month
+    const monthlyPostCount = await Post.countDocuments({
+      createdAt: { $gte: startOfMonth } // Filter posts created from the start of the month
+    });
+  
+    res.status(200).json({ postCount, monthlyPostCount });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

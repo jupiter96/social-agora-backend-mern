@@ -28,12 +28,12 @@ router.route("/create").post(verifyJWT, createGame);
 
 router.route("/addcategory").post(createCategory);
 
-router.route("/:id").delete(verifyJWT, deleteGame);
-
-router.route("/category/:id").delete(deleteCategory);
-
 router.route("/editgame/:id").put(verifyJWT, editGame);
 
 router.route("/editcategory/:id").put(editCategory);
+
+router.route("/:id").delete(verifyJWT, deleteGame);
+
+router.route("/category/:id").delete(deleteCategory);
 
 export default router;

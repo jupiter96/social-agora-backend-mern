@@ -101,8 +101,20 @@ const deleteGroup = async (req, res) => {
 
 const getstatistics = async (req, res) => {
   try {
-    const groupCount = await Group.countDocuments();
-    res.status(200).json({groupCount: groupCount});
+    // Get total game count
+    const groupCount = await Game.countDocuments();
+  
+    // Get the start of the current month
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1); // Set to the first day of the current month
+    startOfMonth.setHours(0, 0, 0, 0); // Set hours to 00:00:00 for accurate comparison
+  
+    // Get game count added this month
+    const monthlyGameCount = await Game.countDocuments({
+      createdAt: { $gte: startOfMonth } // Filter games created from the start of the month
+    });
+  
+    res.status(200).json({ groupCount, monthlyGameCount });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
